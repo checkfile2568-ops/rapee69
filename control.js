@@ -73,7 +73,7 @@
     els.confirmBtn.disabled = state.locked || !state.currentPosition || !state.currentTeamId; els.undoBtn.disabled = state.locked || !state.confirmed.length;
     renderConnection(); renderReadiness();
   }
-  els.openDisplayBtn.addEventListener("click", () => window.open("display.html", "rapee69-display"));
+  els.openDisplayBtn.addEventListener("click", () => window.open("display.html?v=1.4.5", "rapee69-display"));
   document.querySelectorAll("[data-stage]").forEach(button => button.addEventListener("click", () => { state.stage = button.dataset.stage; persist(`เปลี่ยนหน้าจอเป็น ${button.textContent.trim()}`); }));
   els.positionSelect.addEventListener("change", () => {
     const value = els.positionSelect.value;
