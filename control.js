@@ -4,6 +4,7 @@
   let state = A.loadState();
   let lastDisplayPing = 0;
   let remoteOnline = false;
+  const controlClock = document.getElementById("controlClock");
   const els = {
     openDisplayBtn:document.getElementById("openDisplayBtn"), positionSelect:document.getElementById("positionSelect"), teamSelect:document.getElementById("teamSelect"),
     confirmBtn:document.getElementById("confirmBtn"), clearCurrentBtn:document.getElementById("clearCurrentBtn"),
@@ -16,6 +17,13 @@
   };
   const usedPositions = () => new Set(state.confirmed.map(item => item.position));
   const usedTeams = () => new Set(state.confirmed.map(item => Number(item.teamId)));
+  function updateControlClock(){
+    if(!controlClock) return;
+    const now = new Date();
+    const date = new Intl.DateTimeFormat("th-TH", { day:"numeric", month:"long", year:"numeric" }).format(now);
+    const time = new Intl.DateTimeFormat("th-TH", { hour:"2-digit", minute:"2-digit", second:"2-digit" }).format(now);
+    controlClock.textContent = `${date} · เวลา ${time} น.`;
+  }
   const displayConnected = () => Date.now() - lastDisplayPing < 5500;
   function persist(action){ state.lastAction = action; state = A.saveState(state, "update"); render(); }
   function receive(next){ state = A.normalizeState(next); render(); }
@@ -125,5 +133,5 @@
   window.addEventListener("draw-remote-state", event => receive(event.detail.state));
   window.addEventListener("draw-remote-status", event => { remoteOnline = Boolean(event.detail.online); if(Object.values(event.detail.presence || {}).some(item => item.role === "display" && Date.now() - item.at < 5500)) lastDisplayPing = Date.now(); render(); });
   window.addEventListener("beforeunload", event => { if(state.confirmed.length < 7 && !state.locked){ event.preventDefault(); event.returnValue = "ยังจับฉลากไม่ครบ 7 ทีม และยังไม่ได้ล็อกผล"; } });
-  window.DrawRemote?.start?.("control"); setInterval(renderConnection, 1000); setInterval(renderReadiness, 1000); render();
+  window.DrawRemote?.start?.("control"); setInterval(renderConnection, 1000); setInterval(renderReadiness, 1000); updateControlClock(); setInterval(updateControlClock, 1000); render();
 })();
