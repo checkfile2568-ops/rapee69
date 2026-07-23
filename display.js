@@ -3,6 +3,7 @@
   const A = window.DrawApp;
   let state = A.loadState();
   const displayMain = document.getElementById("displayMain");
+  const liveDate = document.getElementById("liveDate");
   const liveClock = document.getElementById("liveClock");
   const params = new URLSearchParams(location.search);
   const forcedStage = A.STAGES.includes(params.get("stage")) ? params.get("stage") : "";
@@ -298,9 +299,12 @@
     window.DrawRemote?.ping?.("display");
   }
   function updateClock(){
-    if(!liveClock) return;
-    const time = new Intl.DateTimeFormat("th-TH", { hour:"2-digit", minute:"2-digit", second:"2-digit" }).format(new Date());
-    liveClock.textContent = `เวลา ${time} น.`;
+    const now = new Date();
+    if(liveDate) liveDate.textContent = new Intl.DateTimeFormat("th-TH", { day:"numeric", month:"long", year:"numeric" }).format(now);
+    if(liveClock){
+      const time = new Intl.DateTimeFormat("th-TH", { hour:"2-digit", minute:"2-digit", second:"2-digit" }).format(now);
+      liveClock.textContent = `เวลา ${time} น.`;
+    }
   }
   async function captureSummary(){
     if(!window.html2canvas){ alert("ยังโหลดเครื่องมือบันทึกภาพไม่สำเร็จ โปรดตรวจการเชื่อมต่ออินเทอร์เน็ตแล้วลองอีกครั้ง"); return; }
