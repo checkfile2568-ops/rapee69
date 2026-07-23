@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>หน้าควบคุม — จับฉลากฟุตบอลวันรพี 69</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand-lockup">
+      <div class="mini-crest">รพี<br><strong>69</strong></div>
+      <div class="brand-copy">
+        <div class="app-kicker">ศาลจังหวัดลพบุรี <span class="version-chip">v1.4</span></div>
+        <h1>หน้าควบคุมการจับฉลากฟุตบอล 7 คน</h1>
+        <div class="header-meta">วันศุกร์ที่ 31 กรกฎาคม 2569 · เวลา 14.00 น.</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn ghost" id="openDisplayBtn">เปิดหน้าจอนำเสนอ</button>
+      <a class="btn ghost" href="index.html">หน้าหลัก</a>
+    </div>
+  </header>
+
+  <main class="control-shell">
+    <section class="panel" style="margin-bottom:20px">
+      <div class="panel-title">
+        <h2>หน้าที่กำลังออกอากาศ</h2>
+        <div class="mode-row">
+          <span id="connectionPill" class="pill ok">● เชื่อมต่อในเครื่อง</span>
+          <span id="modePill" class="pill live">โหมดถ่ายทอดสด</span>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="stage-buttons">
+          <button class="btn stage" data-stage="intro">1. หน้าต้อนรับ</button>
+          <button class="btn stage" data-stage="format">2. รูปแบบแข่งขัน</button>
+          <button class="btn stage" data-stage="draw">3. จับฉลาก</button>
+          <button class="btn stage" data-stage="summary">4. สรุป/ผังแข่งขัน</button>
+          <button class="btn stage" data-stage="schedule">5. ตารางแข่งขัน</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel readiness-panel" style="margin-bottom:20px">
+      <div class="panel-title"><h2>ตรวจความพร้อมก่อนเริ่ม</h2></div>
+      <div class="panel-body"><ul id="readinessList" class="readiness-list"></ul></div>
+    </section>
+
+    <div class="control-grid">
+      <div>
+        <section class="panel">
+          <div class="panel-title">
+            <h2>ดำเนินการจับฉลาก 2 โถ</h2>
+            <span id="progressPill" class="pill">0 / 7 ทีม</span>
+          </div>
+          <div class="panel-body">
+            <div id="lockedAlert" class="alert danger" hidden>
+              🔒 ผลถูกล็อกแล้ว ไม่สามารถแก้ไขได้จนกว่าจะปลดล็อกโดยผู้ควบคุม
+            </div>
+
+            <div class="draw-step">
+              <div class="step-head">
+                <span class="step-no">1</span>
+                <strong>โถที่ 1 — ตำแหน่งการแข่งขัน</strong>
+              </div>
+              <div class="field">
+                <label for="positionSelect">เลือกตำแหน่งที่จับได้จริง</label>
+                <select id="positionSelect">
+                  <option value="">— เลือก A1 ถึง B4 —</option>
+                </select>
+              </div>
+              <button class="btn primary" id="showPositionBtn">แสดงตำแหน่งบนหน้าจอ</button>
+            </div>
+
+            <div class="draw-step">
+              <div class="step-head">
+                <span class="step-no">2</span>
+                <strong>โถที่ 2 — หมายเลขทีม</strong>
+              </div>
+              <div class="field">
+                <label for="teamSelect">เลือกหมายเลขทีมที่จับได้จริง</label>
+                <select id="teamSelect">
+                  <option value="">— เลือกทีมหมายเลข 1 ถึง 7 —</option>
+                </select>
+              </div>
+              <button class="btn primary" id="showTeamBtn">แสดงชื่อทีมบนหน้าจอ</button>
+            </div>
+
+            <div class="current-pair">
+              <div>ผลคู่ปัจจุบัน</div>
+              <div id="currentPosition" class="position">—</div>
+              <div id="currentTeam" class="team">รอจับฉลาก</div>
+              <div id="currentStatus" class="status">เลือกผลจากโถจริง แล้วกดยืนยัน</div>
+            </div>
+
+            <div class="confirm-row">
+              <button class="btn green" id="confirmBtn">✓ ยืนยันและบันทึกผล</button>
+              <button class="btn" id="clearCurrentBtn">ล้างคู่ปัจจุบัน</button>
+            </div>
+
+            <div class="toolbar" style="margin-top:12px">
+              <button class="btn" id="undoBtn">↶ ย้อนกลับผลล่าสุด</button>
+              <button class="btn gold" id="lockBtn">🔒 ล็อกผล</button>
+              <button class="btn" id="modeBtn">สลับโหมดซ้อม/ถ่ายทอดสด</button>
+              <button class="btn" id="rehearsalRandomBtn">สุ่มสำหรับการซ้อม</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" style="margin-top:20px">
+          <div class="panel-title"><h2>ประวัติการยืนยันผล</h2></div>
+          <div class="panel-body history" id="historyList"></div>
+        </section>
+      </div>
+
+      <div>
+        <section class="panel">
+          <div class="panel-title">
+            <h2>ผลการแบ่งสายแบบเรียลไทม์</h2>
+            <span id="stateTime" class="header-meta" style="color:var(--muted)"></span>
+          </div>
+          <div class="panel-body">
+            <div class="board-grid">
+              <div class="group-card group-a">
+                <div class="group-head">สาย A — พบกันหมด 3 ทีม</div>
+                <div class="slot-list" id="groupASlots"></div>
+              </div>
+              <div class="group-card group-b">
+                <div class="group-head">สาย B — Play-off 4 ทีม</div>
+                <div class="slot-list" id="groupBSlots"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" style="margin-top:20px">
+          <div class="panel-title"><h2>โปรแกรมการแข่งขันหลังแทนชื่อทีม</h2></div>
+          <div class="panel-body" style="overflow:auto">
+            <table class="schedule-table">
+              <thead>
+                <tr><th>ลำดับ</th><th>เวลา</th><th>สาย/รอบ</th><th>รายการ</th><th>คู่แข่งขัน</th></tr>
+              </thead>
+              <tbody id="scheduleBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel" style="margin-top:20px">
+          <div class="panel-title"><h2>ส่งออกและสำรองข้อมูล</h2></div>
+          <div class="panel-body">
+            <div class="toolbar">
+              <button class="btn primary" id="copySummaryBtn">คัดลอกข้อความสรุป</button>
+              <button class="btn" id="downloadJsonBtn">ดาวน์โหลดไฟล์สำรอง JSON</button>
+              <button class="btn" id="printBtn">พิมพ์ / บันทึก PDF</button>
+              <button class="btn" id="captureBtn">บันทึกสรุปเป็น PNG</button>
+              <button class="btn red" id="resetBtn">รีเซ็ตทั้งหมด</button>
+            </div>
+            <div class="alert warning">
+              เวอร์ชัน 1.4: พิมพ์และบันทึกภาพจะใช้หน้าสรุปเสมอ
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script src="sync-config.js"></script>
+  <script src="remote-sync.js"></script>
+  <script src="app.js"></script>
+  <script src="control.js"></script>
+</body>
+</html>
