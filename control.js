@@ -6,7 +6,7 @@
   let remoteOnline = false;
   const els = {
     openDisplayBtn:document.getElementById("openDisplayBtn"), positionSelect:document.getElementById("positionSelect"), teamSelect:document.getElementById("teamSelect"),
-    showPositionBtn:document.getElementById("showPositionBtn"), showTeamBtn:document.getElementById("showTeamBtn"), confirmBtn:document.getElementById("confirmBtn"), clearCurrentBtn:document.getElementById("clearCurrentBtn"),
+    confirmBtn:document.getElementById("confirmBtn"), clearCurrentBtn:document.getElementById("clearCurrentBtn"),
     undoBtn:document.getElementById("undoBtn"), lockBtn:document.getElementById("lockBtn"), modeBtn:document.getElementById("modeBtn"), rehearsalRandomBtn:document.getElementById("rehearsalRandomBtn"),
     currentPosition:document.getElementById("currentPosition"), currentTeam:document.getElementById("currentTeam"), currentStatus:document.getElementById("currentStatus"), groupASlots:document.getElementById("groupASlots"),
     groupBSlots:document.getElementById("groupBSlots"), historyList:document.getElementById("historyList"), scheduleBody:document.getElementById("scheduleBody"), progressPill:document.getElementById("progressPill"),
@@ -59,7 +59,7 @@
     document.querySelectorAll("[data-stage]").forEach(button => button.classList.toggle("active", button.dataset.stage === state.stage));
     const live = state.mode === "live";
     els.modePill.textContent = live ? "โหมดถ่ายทอดสด" : "โหมดซ้อม"; els.modePill.className = `pill ${live ? "live" : ""}`; els.rehearsalRandomBtn.hidden = live;
-    [els.positionSelect, els.teamSelect, els.showPositionBtn, els.showTeamBtn, els.confirmBtn, els.clearCurrentBtn, els.undoBtn, els.rehearsalRandomBtn].forEach(el => { el.disabled = state.locked; });
+    [els.positionSelect, els.teamSelect, els.confirmBtn, els.clearCurrentBtn, els.undoBtn, els.rehearsalRandomBtn].forEach(el => { el.disabled = state.locked; });
     els.lockBtn.textContent = state.locked ? "🔓 ปลดล็อกผล" : "🔒 ล็อกผล"; els.lockedAlert.hidden = !state.locked;
     els.progressPill.textContent = `${state.confirmed.length} / 7 ทีม`; els.stateTime.textContent = `บันทึกล่าสุด ${A.formatThaiTime(state.updatedAt)}`;
     els.confirmBtn.disabled = state.locked || !state.currentPosition || !state.currentTeamId; els.undoBtn.disabled = state.locked || !state.confirmed.length;
@@ -67,15 +67,15 @@
   }
   els.openDisplayBtn.addEventListener("click", () => window.open("display.html", "rapee69-display"));
   document.querySelectorAll("[data-stage]").forEach(button => button.addEventListener("click", () => { state.stage = button.dataset.stage; persist(`เปลี่ยนหน้าจอเป็น ${button.textContent.trim()}`); }));
-  els.showPositionBtn.addEventListener("click", () => {
+  els.positionSelect.addEventListener("change", () => {
     const value = els.positionSelect.value;
-    if(!value) return alert("กรุณาเลือกตำแหน่งที่จับได้จากโถที่ 1");
+    if(!value) return;
     if(usedPositions().has(value) && value !== state.currentPosition) return alert("ตำแหน่งนี้ถูกใช้แล้ว");
     state.currentPosition = value; state.stage = "draw"; persist(`แสดงตำแหน่ง ${value}`);
   });
-  els.showTeamBtn.addEventListener("click", () => {
+  els.teamSelect.addEventListener("change", () => {
     const id = Number(els.teamSelect.value), team = A.getTeam(id);
-    if(!team) return alert("กรุณาเลือกหมายเลขทีมที่จับได้จากโถที่ 2");
+    if(!team) return;
     if(usedTeams().has(id) && id !== Number(state.currentTeamId)) return alert("ทีมนี้ถูกใช้แล้ว");
     state.currentTeamId = id; state.stage = "draw"; state.pendingRevealUntil = Date.now() + 2500; persist(`เปิดฉลากทีมหมายเลข ${id}`);
   });
@@ -84,7 +84,6 @@
     if(!state.currentPosition || !team) return alert("ต้องเลือกผลจากทั้ง 2 โถก่อนยืนยัน");
     if(usedPositions().has(state.currentPosition) || usedTeams().has(team.id)) return alert("ตำแหน่งหรือทีมนี้ถูกยืนยันไปแล้ว");
     const result = `${state.currentPosition} — ${team.name}`;
-    if(!confirm(`ยืนยันผล ${result} ใช่หรือไม่`)) return;
     state.confirmed.push({ position:state.currentPosition, teamId:team.id, confirmedAt:new Date().toISOString() });
     state.currentPosition = ""; state.currentTeamId = null; state.pendingRevealUntil = 0; state.stage = state.confirmed.length === 7 ? "summary" : "draw";
     persist(`ยืนยันผล ${result}`);

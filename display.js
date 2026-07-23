@@ -153,7 +153,7 @@
 
     return `
       <section class="slide">
-        <div class="slide-inner">
+        <div class="slide-inner summary-slide">
           <h1 style="font-size:clamp(30px,4vw,52px); margin-bottom:10px">สรุปผลการจับฉลากและรูปแบบแข่งขัน</h1>
           <p class="slide-subtitle">${state.confirmed.length === 7 ? "สรุปสาย A ตารางคะแนนรวม · สาย B ผัง Play-off" : `ดำเนินการแล้ว ${state.confirmed.length} จาก 7 ทีม`}</p>
 
