@@ -418,11 +418,16 @@ h1,h2,h3,.display-title,.group-head,.format-big,.big-position,.big-team,
   text-shadow:0 2px 8px rgba(0,0,0,.26);
 }
 .display-meta{
+  margin-left:auto;
+  display:flex;align-items:center;gap:8px;
   border:1px solid rgba(245,220,140,.48);
   background:rgba(255,255,255,.06);
   padding:7px 12px;
   border-radius:999px;
 }
+.display-meta #liveClock{padding-left:8px;border-left:1px solid rgba(245,220,140,.45);font-variant-numeric:tabular-nums}
+.keyboard-hint{margin-top:12px;color:var(--navy-800);font-size:14px;font-weight:700}
+.keyboard-hint strong{display:inline-grid;place-items:center;min-width:25px;padding:1px 5px;border-radius:5px;background:#e9eef7;color:var(--navy-950)}
 
 .slide{
   position:relative;
@@ -465,6 +470,7 @@ h1,h2,h3,.display-title,.group-head,.format-big,.big-position,.big-team,
     linear-gradient(145deg,#f5f9ff,#fffaf0);
   box-shadow:0 14px 36px rgba(8,25,58,.09);
 }
+.intro-card h1{font-size:clamp(34px,4vw,58px);line-height:1.08}
 .slide-subtitle{
   color:var(--premium-blue);
 }

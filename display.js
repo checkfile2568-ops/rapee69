@@ -3,6 +3,7 @@
   const A = window.DrawApp;
   let state = A.loadState();
   const displayMain = document.getElementById("displayMain");
+  const liveClock = document.getElementById("liveClock");
   const params = new URLSearchParams(location.search);
   const forcedStage = A.STAGES.includes(params.get("stage")) ? params.get("stage") : "";
   let revealTimer;
@@ -42,7 +43,7 @@
         <div class="slide-inner intro-grid">
           <div class="intro-card">
             <p class="slide-subtitle">ศาลจังหวัดลพบุรี</p>
-            <h1>จับฉลากแบ่งสาย<br>ฟุตบอล 7 คน วันรพี 69</h1>
+            <h1>จับฉลากแบ่งสาย<br>ฟุตบอล 7 คน<br>วันรพี 69</h1>
             <div class="intro-details">
               📅 วันศุกร์ที่ 31 กรกฎาคม 2569<br>
               🕑 เวลา 14.00 น.<br>
@@ -296,6 +297,11 @@
     window.drawChannel?.postMessage({ type:"display-presence", at:Date.now() });
     window.DrawRemote?.ping?.("display");
   }
+  function updateClock(){
+    if(!liveClock) return;
+    const time = new Intl.DateTimeFormat("th-TH", { hour:"2-digit", minute:"2-digit", second:"2-digit" }).format(new Date());
+    liveClock.textContent = `เวลา ${time} น.`;
+  }
   async function captureSummary(){
     if(!window.html2canvas){ alert("ยังโหลดเครื่องมือบันทึกภาพไม่สำเร็จ โปรดตรวจการเชื่อมต่ออินเทอร์เน็ตแล้วลองอีกครั้ง"); return; }
     const canvas = await window.html2canvas(displayMain, { backgroundColor:"#ffffff", scale:2, useCORS:true });
@@ -304,6 +310,7 @@
   }
   window.DrawRemote?.start?.("display");
   pingDisplay(); setInterval(pingDisplay, 2000);
+  updateClock(); setInterval(updateClock, 1000);
   render();
   if(params.get("print") === "1") setTimeout(() => window.print(), 600);
   if(params.get("capture") === "1") setTimeout(() => captureSummary(), 800);
