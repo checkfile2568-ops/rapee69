@@ -297,7 +297,7 @@ select,input[type="text"]{
 
 
 /* =========================================================
-   Rapee69 Draw System v1.4 — Ceremony-safe live draw
+   Rapee69 Draw System v1.6 — Ceremony-safe live draw
    Styling-only upgrade: core functions remain unchanged.
    ========================================================= */
 
@@ -702,3 +702,70 @@ h1,h2,h3,.display-title,.group-head,.format-big,.big-position,.big-team,
   .summary-slide .summary-grid-advanced{grid-template-columns:1fr}
 }
 @media (max-width:650px){.readiness-list,.remaining-draw{grid-template-columns:1fr}}
+
+/* =========================================================
+   v1.6 — compact phone remote. It is intentionally independent from
+   the desktop control layout so only the requested actions appear here.
+   ========================================================= */
+.mobile-page{
+  min-height:100dvh;
+  background:linear-gradient(160deg,#e9f1ff 0%,#fffdf8 52%,#f5ead2 100%);
+  -webkit-tap-highlight-color:transparent;
+}
+.mobile-shell{width:min(100%,620px);margin:0 auto;padding:14px 14px calc(24px + env(safe-area-inset-bottom))}
+.mobile-header{display:grid;gap:12px;margin:0 0 14px}
+.mobile-brand{display:flex;align-items:center;gap:11px}
+.mobile-brand .mini-crest{width:50px;height:56px;border-radius:11px 11px 17px 17px;font-size:13px}
+.mobile-brand .mini-crest strong{font-size:22px}
+.mobile-kicker,.mobile-eyebrow{color:var(--premium-blue);font-size:12px;font-weight:900;letter-spacing:.05em;text-transform:uppercase}
+.mobile-brand h1{font-size:clamp(22px,7vw,30px);color:var(--premium-navy);margin:1px 0 0;line-height:1.1}
+.mobile-sync{justify-self:stretch;display:block;padding:9px 12px;border:1px solid #d8dfec;border-radius:999px;text-align:center;font-weight:800;font-size:14px;background:#f5f7fb;color:var(--muted)}
+.mobile-sync.online{background:#eaf7ee;border-color:#83d59d;color:#08752d}
+.mobile-sync.offline{background:#fff6df;border-color:#ebd491;color:#8a6500}
+.mobile-card{margin:13px 0;padding:15px;border:1px solid rgba(13,50,111,.15);border-radius:18px;background:rgba(255,255,255,.97);box-shadow:0 10px 26px rgba(8,25,58,.09)}
+.mobile-stage-card{padding-bottom:14px}
+.mobile-section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.mobile-section-head.compact{margin-bottom:10px}
+.mobile-section-head h2{margin:1px 0 0;color:var(--premium-navy);font-size:20px;line-height:1.2}
+.mobile-section-head>strong{display:grid;place-items:center;min-width:54px;padding:8px 10px;border-radius:999px;background:#edf3ff;color:var(--premium-navy);font-family:"Kanit","Sarabun",sans-serif;font-size:16px}
+.mobile-stage-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.mobile-stage-grid button{min-height:60px;padding:6px 2px;border:1px solid #ccd6e6;border-radius:11px;background:#f8faff;color:var(--premium-navy);font-family:"Kanit","Sarabun",sans-serif;font-size:18px;font-weight:900;line-height:1;touch-action:manipulation}
+.mobile-stage-grid button span{display:block;margin-top:4px;font-family:"Sarabun",sans-serif;font-size:10px;font-weight:800;line-height:1.1}
+.mobile-stage-grid button.active{border-color:var(--premium-gold);background:linear-gradient(145deg,#f7d97f,#e5b847);color:#16233c;box-shadow:0 5px 13px rgba(166,117,20,.22)}
+.mobile-current{margin:13px 0;padding:19px 16px;border:2px solid var(--premium-gold);border-radius:20px;background:radial-gradient(circle at 50% 0,rgba(255,255,255,.38),transparent 12rem),linear-gradient(150deg,#06183b,#0b3b82);box-shadow:0 14px 30px rgba(4,20,49,.23);color:#fff;text-align:center}
+.mobile-current .mobile-eyebrow{color:var(--premium-gold-light)}
+.mobile-position{margin:6px 0 3px;color:var(--premium-gold-light);font-family:"Kanit","Sarabun",sans-serif;font-size:clamp(48px,18vw,72px);font-weight:900;line-height:1}
+.mobile-team{font-family:"Kanit","Sarabun",sans-serif;font-size:clamp(21px,6vw,29px);font-weight:800;line-height:1.25}
+.mobile-current-status{margin-top:9px;color:#dce9ff;font-size:14px;font-weight:700}
+.mobile-position-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.mobile-choice{min-height:72px;padding:7px 4px;border:2px solid #d9e1ed;border-radius:14px;background:#fff;color:var(--premium-navy);font-family:"Kanit","Sarabun",sans-serif;font-size:27px;font-weight:900;touch-action:manipulation}
+.mobile-choice small{display:block;min-height:15px;font-family:"Sarabun",sans-serif;font-size:11px;font-weight:700;line-height:1}
+.mobile-choice.a{border-color:#f2b18c;background:#fff8f4}.mobile-choice.b{border-color:#97d8ad;background:#f5fff8}
+.mobile-choice.selected{border-color:var(--premium-gold);background:#fff0bc;box-shadow:0 0 0 3px rgba(216,170,61,.17)}
+.mobile-choice:disabled,.mobile-team-choice:disabled{opacity:.47}
+.mobile-team-grid{display:grid;gap:8px}
+.mobile-team-choice{position:relative;display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:9px;width:100%;min-height:56px;padding:9px 10px;border:1px solid #d6dfec;border-radius:13px;background:#fbfcff;color:var(--ink);text-align:left;touch-action:manipulation}
+.mobile-team-choice b{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--premium-navy);color:#fff;font-family:"Kanit","Sarabun",sans-serif;font-size:18px}
+.mobile-team-choice span{font-weight:800;font-size:16px;line-height:1.18}.mobile-team-choice small{color:var(--muted);font-size:11px;font-weight:800}
+.mobile-team-choice.selected{border:2px solid var(--premium-gold);background:#fff8df}.mobile-team-choice.selected b{background:var(--premium-gold);color:#17233c}
+.mobile-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:15px}.mobile-actions .primary{grid-column:1/-1}
+.mobile-btn{min-height:54px;padding:10px;border:0;border-radius:14px;background:#e9eef7;color:var(--ink);font-family:"Kanit","Sarabun",sans-serif;font-size:17px;font-weight:800;touch-action:manipulation;box-shadow:0 5px 13px rgba(8,25,58,.08)}
+.mobile-btn.primary{background:linear-gradient(100deg,#0d6d30,#22a557);color:#fff;font-size:21px}.mobile-btn.danger{background:#fff0ee;color:#a12b21;border:1px solid #efb4ae}.mobile-btn:disabled{opacity:.42}
+.mobile-hint{margin:13px 4px 0;color:var(--muted);font-size:13px;font-weight:700;line-height:1.4;text-align:center}
+@media (min-width:1101px){.home-page .launch-grid{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:410px){.mobile-shell{padding-left:10px;padding-right:10px}.mobile-stage-grid{gap:4px}.mobile-stage-grid button{font-size:16px}.mobile-team-choice span{font-size:15px}.mobile-position-grid{gap:6px}.mobile-choice{font-size:24px}}
+
+/* v1.6 — one-session QR bridge for a phone on any internet connection. */
+.mobile-session-subtitle{margin-top:3px;color:var(--muted);font-size:13px;font-weight:700;line-height:1.35}
+.mobile-session-body{padding:16px 18px 18px}
+.mobile-session-actions{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:14px}
+.mobile-session-grid{display:grid;grid-template-columns:1fr 210px;gap:18px;align-items:center}
+.mobile-session-info{display:grid;gap:10px}
+.session-row{display:grid;grid-template-columns:minmax(150px,.8fr) 1.2fr;gap:12px;align-items:center;padding:11px 12px;border:1px solid #d9e1ed;border-radius:12px;background:#f8faff}
+.session-row span{color:var(--muted);font-weight:700}.session-row strong{color:var(--premium-navy);font-family:"Kanit","Sarabun",sans-serif;overflow-wrap:anywhere}
+.session-note{margin:0;padding:11px 12px;border-radius:12px;border-left:4px solid var(--premium-gold);background:#fff9e8;color:#624d15;font-weight:700;line-height:1.45}
+.session-note code{padding:1px 4px;border-radius:4px;background:rgba(255,255,255,.7);font-family:Consolas,monospace;font-size:.9em}
+.mobile-qr-wrap{display:grid;justify-items:center;gap:7px;padding:10px;border:1px solid rgba(13,50,111,.14);border-radius:16px;background:linear-gradient(145deg,#f8fbff,#fffaf0)}
+.mobile-qr-wrap canvas{display:block;width:180px;height:180px;border-radius:8px;background:#fff;image-rendering:pixelated}
+.mobile-qr-caption{max-width:190px;color:var(--muted);font-size:12px;font-weight:700;line-height:1.3;text-align:center}
+@media (max-width:720px){.mobile-session-grid{grid-template-columns:1fr}.mobile-qr-wrap{justify-self:center}.session-row{grid-template-columns:1fr}.mobile-session-actions .btn{flex:1 1 190px}}

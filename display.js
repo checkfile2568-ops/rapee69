@@ -292,7 +292,11 @@
       render();
     }
   });
-  window.addEventListener("draw-remote-state", event => { state = A.normalizeState(event.detail.state); render(); });
+  window.addEventListener("draw-remote-state", event => {
+    if(event.detail.room && window.DrawRemote?.room && event.detail.room !== window.DrawRemote.room) return;
+    state = A.normalizeState(event.detail.state); render();
+  });
+  window.addEventListener("draw-firebase-state", event => { state = A.normalizeState(event.detail.state); render(); });
   function pingDisplay(){
     window.drawChannel?.postMessage({ type:"display-presence", at:Date.now() });
     window.DrawRemote?.ping?.("display");

@@ -8,10 +8,15 @@
 index.html
 control.html
 display.html
+mobile-control.html
 styles.css
 app.js
 control.js
 display.js
+mobile-control.js
+firebase-config.js
+firebase-sync.js
+APPS_SCRIPT_QR_SETUP_TH.md
 .nojekyll
 assets/
 ```
@@ -25,7 +30,7 @@ assets/
 5. Commit message แนะนำ:
 
 ```text
-ติดตั้งระบบจับฉลากฟุตบอลวันรพี 69 เวอร์ชัน 1.3
+ติดตั้งระบบจับฉลากฟุตบอลวันรพี 69 เวอร์ชัน 1.6
 ```
 
 6. เข้า **Settings → Pages**
@@ -47,6 +52,9 @@ https://checkfile2568-ops.github.io/rapee69-draw-system/control.html
 
 หน้าจอนำเสนอ
 https://checkfile2568-ops.github.io/rapee69-draw-system/display.html
+
+หน้าควบคุมมือถือ
+https://checkfile2568-ops.github.io/rapee69-draw-system/mobile-control.html
 ```
 
 ## วิธีใช้กับ Google Meet
@@ -58,6 +66,10 @@ https://checkfile2568-ops.github.io/rapee69-draw-system/display.html
 3. `display.html`
 
 จาก Meet เลือก **นำเสนอทันที → แท็บ → เลือก display.html**
+
+## ใช้มือถือคนละเครื่อง
+
+แนะนำตั้งค่า Apps Script ตาม `APPS_SCRIPT_QR_SETUP_TH.md` ก่อน จากนั้นเปิด `control.html` แล้วกด **เริ่ม / แสดง QR ควบคุมมือถือ** หน้ามือถือจะเชื่อมผ่าน QR นี้ได้แม้อยู่คนละเครือข่าย หากยังไม่ตั้งค่า Apps Script หรือ Firebase หน้าควบคุมมือถือจะไม่เชื่อมไปยังคอมคนละเครื่อง แต่หน้าควบคุมบนคอมและการทำงานเดิมยังใช้งานได้ปกติ
 
 ## เมื่ออัปโหลดไฟล์แก้ไขทับของเดิม
 

@@ -3,7 +3,24 @@
   const A = window.DrawApp;
   let state = A.loadState();
   let lastDisplayPing = 0;
+  let lastMobilePing = 0;
   let remoteOnline = false;
+  const MOBILE_SESSION_STORAGE_KEY = "rapee69_mobile_session_v16";
+  let qrLinkRendered = "";
+  function cleanRoom(value){ return String(value || "").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 64); }
+  function loadMobileSession(){
+    try {
+      const saved = JSON.parse(localStorage.getItem(MOBILE_SESSION_STORAGE_KEY) || "null");
+      return saved && cleanRoom(saved.room) ? { room:cleanRoom(saved.room), createdAt:Number(saved.createdAt) || Date.now() } : null;
+    } catch { return null; }
+  }
+  function createRoom(){
+    const date = new Date().toISOString().slice(2,10).replaceAll("-", "");
+    const random = (crypto.randomUUID?.() || Math.random().toString(36).slice(2)).replaceAll("-", "").slice(0, 6);
+    return `r69-${date}-${random}`;
+  }
+  let mobileSession = loadMobileSession();
+  if(mobileSession) window.DrawRemote?.configure?.({ room:mobileSession.room });
   const controlClock = document.getElementById("controlClock");
   const els = {
     openDisplayBtn:document.getElementById("openDisplayBtn"), positionSelect:document.getElementById("positionSelect"), teamSelect:document.getElementById("teamSelect"),
@@ -13,7 +30,9 @@
     groupBSlots:document.getElementById("groupBSlots"), historyList:document.getElementById("historyList"), scheduleBody:document.getElementById("scheduleBody"), progressPill:document.getElementById("progressPill"),
     modePill:document.getElementById("modePill"), connectionPill:document.getElementById("connectionPill"), readinessList:document.getElementById("readinessList"), stateTime:document.getElementById("stateTime"),
     lockedAlert:document.getElementById("lockedAlert"), copySummaryBtn:document.getElementById("copySummaryBtn"), downloadJsonBtn:document.getElementById("downloadJsonBtn"), printBtn:document.getElementById("printBtn"),
-    captureBtn:document.getElementById("captureBtn"), resetBtn:document.getElementById("resetBtn")
+    captureBtn:document.getElementById("captureBtn"), resetBtn:document.getElementById("resetBtn"),
+    startMobileSessionBtn:document.getElementById("startMobileSessionBtn"), renewMobileSessionBtn:document.getElementById("renewMobileSessionBtn"), copyMobileLinkBtn:document.getElementById("copyMobileLinkBtn"),
+    mobileSessionPill:document.getElementById("mobileSessionPill"), mobileSessionCode:document.getElementById("mobileSessionCode"), mobileSessionStatus:document.getElementById("mobileSessionStatus"), mobileSessionNote:document.getElementById("mobileSessionNote"), mobileQrCanvas:document.getElementById("mobileQrCanvas")
   };
   const usedPositions = () => new Set(state.confirmed.map(item => item.position));
   const usedTeams = () => new Set(state.confirmed.map(item => Number(item.teamId)));
@@ -59,6 +78,77 @@
     ];
     els.readinessList.innerHTML = checks.map(([ok, label]) => `<li class="${ok ? "ready" : "not-ready"}">${ok ? "✓" : "!"} ${label}</li>`).join("");
   }
+  function mobileLink(){
+    if(!mobileSession) return "";
+    const url = new URL("mobile-control.html", location.href);
+    url.searchParams.set("room", mobileSession.room);
+    return url.toString();
+  }
+  function displayLink(){
+    const url = new URL("display.html", location.href);
+    url.searchParams.set("v", "1.6.0");
+    if(mobileSession) url.searchParams.set("room", mobileSession.room);
+    return url.toString();
+  }
+  function drawQr(link){
+    if(!els.mobileQrCanvas || link === qrLinkRendered) return;
+    qrLinkRendered = link;
+    const context = els.mobileQrCanvas.getContext("2d");
+    context.clearRect(0, 0, els.mobileQrCanvas.width, els.mobileQrCanvas.height);
+    if(!link) return;
+    if(window.QRCode?.toCanvas){
+      window.QRCode.toCanvas(els.mobileQrCanvas, link, { width:180, margin:1, errorCorrectionLevel:"M", color:{ dark:"#071a3f", light:"#ffffff" } }, () => {});
+    } else {
+      context.fillStyle = "#071a3f"; context.font = "bold 13px sans-serif"; context.textAlign = "center";
+      context.fillText("กำลังโหลด QR", 90, 90);
+    }
+  }
+  function mobileAge(){ return lastMobilePing ? Math.max(0, Math.round((Date.now() - lastMobilePing) / 1000)) : null; }
+  function renderMobileSession(){
+    const ready = Boolean(window.DrawRemote?.enabled);
+    const link = mobileLink();
+    els.mobileSessionCode.textContent = mobileSession?.room || "ยังไม่ได้เริ่มรอบ";
+    els.copyMobileLinkBtn.disabled = !link;
+    els.renewMobileSessionBtn.disabled = !ready;
+    if(!ready){
+      els.mobileSessionPill.className = "pill offline"; els.mobileSessionPill.textContent = "ต้องตั้งค่า Apps Script";
+      els.mobileSessionStatus.textContent = "ยังไม่พร้อมเชื่อมข้ามเครือข่าย";
+      els.mobileSessionNote.innerHTML = "ใส่ URL ที่ลงท้ายด้วย <code>/exec</code> ใน <code>sync-config.js</code> ก่อน แล้วรีเฟรชหน้านี้";
+      drawQr("");
+      return;
+    }
+    if(!mobileSession){
+      els.mobileSessionPill.className = "pill offline"; els.mobileSessionPill.textContent = "พร้อมสร้าง QR";
+      els.mobileSessionStatus.textContent = "กดเริ่มเพื่อสร้าง QR สำหรับรอบนี้";
+      els.mobileSessionNote.textContent = "ระบบจะจำรหัสรอบในคอมเครื่องนี้ และใช้ QR เดิมจนกว่าจะกดสร้างรอบใหม่";
+      drawQr("");
+      return;
+    }
+    const age = mobileAge();
+    if(age !== null && age < 20){
+      els.mobileSessionPill.className = "pill ok"; els.mobileSessionPill.textContent = "● มือถือเชื่อมต่อแล้ว";
+      els.mobileSessionStatus.textContent = "มือถือพร้อมควบคุม";
+      els.mobileSessionNote.textContent = "หากจอดับ ระบบจะกลับมาเชื่อมต่อเองเมื่อปลุกหน้าจอ โดยไม่ต้องสร้าง QR ใหม่";
+    } else if(age !== null && age < 180){
+      els.mobileSessionPill.className = "pill offline"; els.mobileSessionPill.textContent = "● มือถือพักหน้าจอ";
+      els.mobileSessionStatus.textContent = `ไม่พบสัญญาณ ${age} วินาที — QR เดิมยังใช้ได้`;
+      els.mobileSessionNote.textContent = "ปลุกหน้าจอหรือกลับมาที่แท็บเดิม ระบบจะเชื่อมต่ออีกครั้งอัตโนมัติ";
+    } else {
+      els.mobileSessionPill.className = "pill offline"; els.mobileSessionPill.textContent = "● QR พร้อมให้สแกน";
+      els.mobileSessionStatus.textContent = age === null ? "รอมือถือสแกน QR" : `มือถือไม่ได้ใช้งาน ${Math.floor(age / 60)} นาที — QR เดิมยังใช้ได้`;
+      els.mobileSessionNote.textContent = "ไม่ต้องสร้าง QR ใหม่: เปิดแท็บเดิมในมือถือ หรือสแกน QR เดิมอีกครั้งหากเบราว์เซอร์ถูกปิด";
+    }
+    drawQr(link);
+  }
+  function startMobileSession(newSession = false){
+    if(!window.DrawRemote?.enabled) return alert("ยังไม่ได้ตั้งค่า Apps Script ใน sync-config.js");
+    if(newSession || !mobileSession){
+      mobileSession = { room:createRoom(), createdAt:Date.now() };
+      localStorage.setItem(MOBILE_SESSION_STORAGE_KEY, JSON.stringify(mobileSession));
+    }
+    window.DrawRemote.configure({ room:mobileSession.room });
+    persist(`เปิดรอบควบคุมมือถือ ${mobileSession.room}`);
+  }
   function render(){
     renderSelects(); renderCurrent();
     els.groupASlots.innerHTML = A.buildSlotsHtml(state, "A"); els.groupBSlots.innerHTML = A.buildSlotsHtml(state, "B");
@@ -71,9 +161,19 @@
     els.lockBtn.textContent = state.locked ? "🔓 ปลดล็อกผล" : "🔒 ล็อกผล"; els.lockedAlert.hidden = !state.locked;
     els.progressPill.textContent = `${state.confirmed.length} / 7 ทีม`; els.stateTime.textContent = `บันทึกล่าสุด ${A.formatThaiTime(state.updatedAt)}`;
     els.confirmBtn.disabled = state.locked || !state.currentPosition || !state.currentTeamId; els.undoBtn.disabled = state.locked || !state.confirmed.length;
-    renderConnection(); renderReadiness();
+    renderConnection(); renderReadiness(); renderMobileSession();
   }
-  els.openDisplayBtn.addEventListener("click", () => window.open("display.html?v=1.4.5", "rapee69-display"));
+  els.openDisplayBtn.addEventListener("click", () => window.open(displayLink(), "rapee69-display"));
+  els.startMobileSessionBtn.addEventListener("click", () => startMobileSession(false));
+  els.renewMobileSessionBtn.addEventListener("click", () => {
+    if(!confirm("สร้าง QR รอบใหม่ใช่หรือไม่\nมือถือที่เปิดอยู่จะต้องสแกน QR ใหม่")) return;
+    startMobileSession(true);
+  });
+  els.copyMobileLinkBtn.addEventListener("click", async () => {
+    const link = mobileLink(); if(!link) return;
+    try { await navigator.clipboard.writeText(link); alert("คัดลอกลิงก์ควบคุมมือถือแล้ว"); }
+    catch { prompt("คัดลอกลิงก์นี้", link); }
+  });
   document.querySelectorAll("[data-stage]").forEach(button => button.addEventListener("click", () => { state.stage = button.dataset.stage; persist(`เปลี่ยนหน้าจอเป็น ${button.textContent.trim()}`); }));
   els.positionSelect.addEventListener("change", () => {
     const value = els.positionSelect.value;
@@ -125,13 +225,25 @@
     try { await navigator.clipboard.writeText(lines.join("\n")); alert("คัดลอกข้อความสรุปแล้ว"); } catch { prompt("คัดลอกข้อความด้านล่าง", lines.join("\n")); }
   });
   els.downloadJsonBtn.addEventListener("click", () => { const blob = new Blob([JSON.stringify(state, null, 2)], { type:"application/json" }), url = URL.createObjectURL(blob), a = document.createElement("a"); a.href = url; a.download = `rapee69-draw-backup-${new Date().toISOString().slice(0,19).replaceAll(":","-")}.json`; a.click(); URL.revokeObjectURL(url); });
-  els.printBtn.addEventListener("click", () => window.open("display.html?print=1&stage=summary", "_blank"));
-  els.captureBtn.addEventListener("click", () => window.open("display.html?capture=1&stage=summary", "_blank"));
+  els.printBtn.addEventListener("click", () => { const url = new URL(displayLink()); url.searchParams.set("print", "1"); url.searchParams.set("stage", "summary"); window.open(url, "_blank"); });
+  els.captureBtn.addEventListener("click", () => { const url = new URL(displayLink()); url.searchParams.set("capture", "1"); url.searchParams.set("stage", "summary"); window.open(url, "_blank"); });
   els.resetBtn.addEventListener("click", () => { if(prompt("พิมพ์คำว่า RESET เพื่อยืนยันล้างข้อมูลทั้งหมด") !== "RESET") return; state = A.emptyState(); persist("รีเซ็ตระบบทั้งหมด"); });
   if(window.drawChannel) window.drawChannel.addEventListener("message", event => { if(event.data?.type === "display-presence") { lastDisplayPing = Date.now(); render(); } else if(event.data?.state) receive(event.data.state); });
   window.addEventListener("storage", event => { if(event.key === A.STORAGE_KEY) receive(A.loadState()); });
-  window.addEventListener("draw-remote-state", event => receive(event.detail.state));
-  window.addEventListener("draw-remote-status", event => { remoteOnline = Boolean(event.detail.online); if(Object.values(event.detail.presence || {}).some(item => item.role === "display" && Date.now() - item.at < 5500)) lastDisplayPing = Date.now(); render(); });
+  window.addEventListener("draw-remote-state", event => {
+    if(mobileSession && event.detail.room && event.detail.room !== mobileSession.room) return;
+    receive(event.detail.state);
+  });
+  window.addEventListener("draw-firebase-state", event => receive(event.detail.state));
+  window.addEventListener("draw-remote-status", event => {
+    if(mobileSession && event.detail.room && event.detail.room !== mobileSession.room) return;
+    remoteOnline = Boolean(event.detail.online);
+    const presence = Object.values(event.detail.presence || {});
+    if(presence.some(item => item.role === "display" && Date.now() - item.at < 5500)) lastDisplayPing = Date.now();
+    const mobileTimes = presence.filter(item => item.role === "mobile" && Number(item.at)).map(item => Number(item.at));
+    if(mobileTimes.length) lastMobilePing = Math.max(lastMobilePing, ...mobileTimes);
+    render();
+  });
   window.addEventListener("beforeunload", event => { if(state.confirmed.length < 7 && !state.locked){ event.preventDefault(); event.returnValue = "ยังจับฉลากไม่ครบ 7 ทีม และยังไม่ได้ล็อกผล"; } });
   window.DrawRemote?.start?.("control"); setInterval(renderConnection, 1000); setInterval(renderReadiness, 1000); updateControlClock(); setInterval(updateControlClock, 1000); render();
 })();

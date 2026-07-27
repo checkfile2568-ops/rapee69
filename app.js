@@ -1,7 +1,9 @@
 (() => {
   "use strict";
 
-  const VERSION = "1.4";
+  const VERSION = "1.6";
+  // Keep the v1.4 key/channel so an existing control computer retains its saved draw.
+  // v1.6 adds a one-session QR bridge for the same draw state.
   const STORAGE_KEY = "rapee69_draw_state_v14";
   const CHANNEL_NAME = "rapee69_draw_channel_v14";
   const STAGES = ["intro", "format", "draw", "summary", "schedule"];
@@ -56,6 +58,7 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     if(window.drawChannel) window.drawChannel.postMessage({ type: message, state });
     window.DrawRemote?.publishState?.(state);
+    window.DrawFirebase?.publishState?.(state);
     window.dispatchEvent(new CustomEvent("draw-state-changed", { detail: state }));
     return state;
   }

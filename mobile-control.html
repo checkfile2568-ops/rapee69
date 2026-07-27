@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#071a3f" />
+  <title>ควบคุมด้วยมือถือ — จับฉลากฟุตบอลวันรพี 69</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=1.6.0" />
+</head>
+<body class="mobile-page">
+  <main class="mobile-shell">
+    <header class="mobile-header">
+      <div class="mobile-brand">
+        <div class="mini-crest">รพี<br><strong>69</strong></div>
+        <div>
+          <div class="mobile-kicker">ระบบรีโมตควบคุม</div>
+          <h1>จับฉลากฟุตบอล 7 คน</h1>
+        </div>
+      </div>
+      <div id="mobileSyncPill" class="mobile-sync checking">กำลังตรวจสอบการเชื่อมต่อ</div>
+    </header>
+
+    <section class="mobile-card mobile-stage-card">
+      <div class="mobile-section-head">
+        <div><span class="mobile-eyebrow">หน้าจอที่ออกอากาศ</span><h2 id="mobileStageName">หน้าต้อนรับ</h2></div>
+        <strong id="mobileProgress">0 / 7</strong>
+      </div>
+      <div class="mobile-stage-grid" aria-label="เลือกหน้าจอนำเสนอ">
+        <button data-stage="intro">1<br><span>ต้อนรับ</span></button>
+        <button data-stage="format">2<br><span>รูปแบบ</span></button>
+        <button data-stage="draw">3<br><span>จับฉลาก</span></button>
+        <button data-stage="summary">4<br><span>สรุป</span></button>
+        <button data-stage="schedule">5<br><span>ตาราง</span></button>
+      </div>
+    </section>
+
+    <section class="mobile-current" aria-live="polite">
+      <div class="mobile-eyebrow">ผลคู่ปัจจุบัน</div>
+      <div id="mobileCurrentPosition" class="mobile-position">—</div>
+      <div id="mobileCurrentTeam" class="mobile-team">เลือกผลจากโถจริง</div>
+      <div id="mobileCurrentStatus" class="mobile-current-status">เริ่มจากเลือกตำแหน่ง A1–B4</div>
+    </section>
+
+    <section class="mobile-card">
+      <div class="mobile-section-head compact">
+        <div><span class="mobile-eyebrow">โถที่ 1</span><h2>ตำแหน่งการแข่งขัน</h2></div>
+      </div>
+      <div id="mobilePositionButtons" class="mobile-position-grid"></div>
+    </section>
+
+    <section class="mobile-card">
+      <div class="mobile-section-head compact">
+        <div><span class="mobile-eyebrow">โถที่ 2</span><h2>หมายเลขทีม</h2></div>
+      </div>
+      <div id="mobileTeamButtons" class="mobile-team-grid"></div>
+    </section>
+
+    <section class="mobile-actions" aria-label="คำสั่งสำคัญ">
+      <button id="mobileConfirmBtn" class="mobile-btn primary">ยืนยันผล</button>
+      <button id="mobileClearBtn" class="mobile-btn">ล้างคู่ปัจจุบัน</button>
+      <button id="mobileUndoBtn" class="mobile-btn danger">ย้อนกลับผลล่าสุด</button>
+    </section>
+
+    <p id="mobileHint" class="mobile-hint">คอมพิวเตอร์ยังใช้หน้าควบคุมเดิมได้ตลอดเวลา</p>
+  </main>
+
+  <script src="sync-config.js?v=1.6.0"></script>
+  <script src="firebase-config.js?v=1.6.0"></script>
+  <script src="remote-sync.js?v=1.6.0"></script>
+  <script src="app.js?v=1.6.0"></script>
+  <script type="module" src="firebase-sync.js?v=1.6.0"></script>
+  <script src="mobile-control.js?v=1.6.0"></script>
+</body>
+</html>

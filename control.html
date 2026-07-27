@@ -7,20 +7,21 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=1.4.5" />
+  <link rel="stylesheet" href="styles.css?v=1.6.0" />
 </head>
 <body>
   <header class="app-header">
     <div class="brand-lockup">
       <div class="mini-crest">รพี<br><strong>69</strong></div>
       <div class="brand-copy">
-        <div class="app-kicker">ศาลจังหวัดลพบุรี <span class="version-chip">v1.4</span></div>
+        <div class="app-kicker">ศาลจังหวัดลพบุรี <span class="version-chip">v1.6</span></div>
         <h1>หน้าควบคุมการจับฉลากฟุตบอล 7 คน</h1>
         <div id="controlClock" class="header-meta">วันที่ -- · เวลา --:--:-- น.</div>
       </div>
     </div>
     <div class="header-actions">
       <button class="btn ghost" id="openDisplayBtn">เปิดหน้าจอนำเสนอ</button>
+      <a class="btn ghost" href="mobile-control.html" target="_blank" rel="noopener">เปิดหน้าควบคุมมือถือ</a>
       <a class="btn ghost" href="index.html">หน้าหลัก</a>
     </div>
   </header>
@@ -49,6 +50,34 @@
     <section class="panel readiness-panel" style="margin-bottom:20px">
       <div class="panel-title"><h2>ตรวจความพร้อมก่อนเริ่ม</h2></div>
       <div class="panel-body"><ul id="readinessList" class="readiness-list"></ul></div>
+    </section>
+
+    <section class="panel mobile-session-panel" style="margin-bottom:20px">
+      <div class="panel-title">
+        <div>
+          <h2>เชื่อมต่อควบคุมด้วยมือถือ</h2>
+          <div class="mobile-session-subtitle">สร้าง QR เพียงครั้งเดียวสำหรับรอบนี้ — จอดับแล้วสแกน QR เดิมหรือเปิดแท็บเดิมได้</div>
+        </div>
+        <span id="mobileSessionPill" class="pill offline">กำลังเตรียม QR</span>
+      </div>
+      <div class="panel-body mobile-session-body">
+        <div class="mobile-session-actions">
+          <button class="btn primary" id="startMobileSessionBtn">เริ่ม / แสดง QR ควบคุมมือถือ</button>
+          <button class="btn" id="renewMobileSessionBtn">สร้าง QR รอบใหม่</button>
+          <button class="btn" id="copyMobileLinkBtn">คัดลอกลิงก์มือถือ</button>
+        </div>
+        <div class="mobile-session-grid">
+          <div class="mobile-session-info">
+            <div class="session-row"><span>รหัสรอบควบคุม</span><strong id="mobileSessionCode">—</strong></div>
+            <div class="session-row"><span>สถานะมือถือ</span><strong id="mobileSessionStatus">ยังไม่ได้เริ่มรอบ</strong></div>
+            <p id="mobileSessionNote" class="session-note">ตั้งค่า Apps Script ใน <code>sync-config.js</code> ก่อนใช้งานข้ามเครือข่าย</p>
+          </div>
+          <div class="mobile-qr-wrap">
+            <canvas id="mobileQrCanvas" width="180" height="180" aria-label="QR สำหรับเปิดหน้าควบคุมมือถือ"></canvas>
+            <div class="mobile-qr-caption">สแกนครั้งเดียว แล้วใช้ลิงก์เดิมตลอดรอบ</div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <div class="control-grid">
@@ -159,7 +188,7 @@
               <button class="btn red" id="resetBtn">รีเซ็ตทั้งหมด</button>
             </div>
             <div class="alert warning">
-              เวอร์ชัน 1.4: พิมพ์และบันทึกภาพจะใช้หน้าสรุปเสมอ
+              เวอร์ชัน 1.6: พิมพ์และบันทึกภาพจะใช้หน้าสรุปเสมอ
             </div>
           </div>
         </section>
@@ -167,9 +196,12 @@
     </div>
   </main>
 
-  <script src="sync-config.js?v=1.4.5"></script>
-  <script src="remote-sync.js?v=1.4.5"></script>
-  <script src="app.js?v=1.4.5"></script>
-  <script src="control.js?v=1.4.5"></script>
+  <script src="sync-config.js?v=1.6.0"></script>
+  <script src="firebase-config.js?v=1.6.0"></script>
+  <script src="remote-sync.js?v=1.6.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+  <script src="app.js?v=1.6.0"></script>
+  <script type="module" src="firebase-sync.js?v=1.6.0"></script>
+  <script src="control.js?v=1.6.0"></script>
 </body>
 </html>
