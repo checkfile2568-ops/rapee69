@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=1.7.4" />
+  <link rel="stylesheet" href="styles.css?v=1.7.5" />
 </head>
 <body>
   <header class="app-header">
@@ -84,10 +84,10 @@
 
     <div class="control-grid">
       <div>
-        <section class="panel">
+        <section class="panel" id="drawWorkflow">
           <div class="panel-title">
             <h2>ดำเนินการจับฉลาก 2 โถ</h2>
-            <span id="progressPill" class="pill">0 / 7 ทีม</span>
+            <span id="progressPill" class="pill">ครั้งที่ 1 จาก 7</span>
           </div>
           <div class="panel-body">
             <div id="lockedAlert" class="alert danger" hidden>
@@ -121,6 +121,7 @@
             </div>
 
             <div class="current-pair">
+              <div id="currentRound" class="round">ครั้งที่ 1 จาก 7</div>
               <div>ผลคู่ปัจจุบัน</div>
               <div id="currentPosition" class="position">—</div>
               <div id="currentTeam" class="team">รอจับฉลาก</div>
@@ -186,11 +187,17 @@
               <button class="btn primary" id="copySummaryBtn">คัดลอกข้อความสรุป</button>
               <button class="btn" id="downloadJsonBtn">ดาวน์โหลดไฟล์สำรอง JSON</button>
               <button class="btn" id="printBtn">พิมพ์ / บันทึก PDF</button>
+              <label class="capture-choice">ภาพ PNG
+                <select id="captureStageSelect">
+                  <option value="official">ผลการจับฉลากอย่างเป็นทางการ</option>
+                  <option value="schedule">ผลตารางแข่งขัน สาย A และ สาย B</option>
+                </select>
+              </label>
               <button class="btn" id="captureBtn">บันทึกผลเป็น PNG เพื่อแชร์</button>
               <button class="btn red" id="resetBtn">รีเซ็ตทั้งหมด</button>
             </div>
             <div class="alert warning">
-              เวอร์ชัน 1.7: พิมพ์และบันทึกภาพจะใช้หน้าผลการจับฉลากอย่างเป็นทางการ
+              เวอร์ชัน 1.7: เลือกภาพผลการจับฉลาก หรือผลตารางแข่งขันก่อนบันทึก PNG
             </div>
           </div>
         </section>
@@ -204,6 +211,6 @@
   <script src="vendor/qrcode.min.js?v=1.0.0"></script>
   <script src="app.js?v=1.7.0"></script>
   <script type="module" src="firebase-sync.js?v=1.7.0"></script>
-  <script src="control.js?v=1.7.4"></script>
+  <script src="control.js?v=1.7.5"></script>
 </body>
 </html>

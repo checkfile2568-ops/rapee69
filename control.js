@@ -4,6 +4,8 @@
   let state = A.loadState();
   let lastDisplayPing = 0;
   let lastMobilePing = 0;
+  let drawFocusTimer = 0;
+  let highlightTimer = 0;
   let remoteOnline = false;
   let firebaseStatus = { enabled: Boolean(window.DrawFirebase?.enabled), online: false, error: "" };
   const MOBILE_SESSION_STORAGE_KEY = "rapee69_mobile_session_v16";
@@ -27,11 +29,11 @@
     openDisplayBtn:document.getElementById("openDisplayBtn"), positionSelect:document.getElementById("positionSelect"), teamSelect:document.getElementById("teamSelect"),
     confirmBtn:document.getElementById("confirmBtn"), clearCurrentBtn:document.getElementById("clearCurrentBtn"),
     undoBtn:document.getElementById("undoBtn"), lockBtn:document.getElementById("lockBtn"), modeBtn:document.getElementById("modeBtn"), rehearsalRandomBtn:document.getElementById("rehearsalRandomBtn"),
-    currentPosition:document.getElementById("currentPosition"), currentTeam:document.getElementById("currentTeam"), currentStatus:document.getElementById("currentStatus"), groupASlots:document.getElementById("groupASlots"),
+    currentRound:document.getElementById("currentRound"), currentPosition:document.getElementById("currentPosition"), currentTeam:document.getElementById("currentTeam"), currentStatus:document.getElementById("currentStatus"), groupASlots:document.getElementById("groupASlots"),
     groupBSlots:document.getElementById("groupBSlots"), historyList:document.getElementById("historyList"), scheduleBody:document.getElementById("scheduleBody"), progressPill:document.getElementById("progressPill"),
     modePill:document.getElementById("modePill"), connectionPill:document.getElementById("connectionPill"), readinessList:document.getElementById("readinessList"), stateTime:document.getElementById("stateTime"), firebaseStatus:document.getElementById("controlFirebaseStatus"),
     lockedAlert:document.getElementById("lockedAlert"), copySummaryBtn:document.getElementById("copySummaryBtn"), downloadJsonBtn:document.getElementById("downloadJsonBtn"), printBtn:document.getElementById("printBtn"),
-    captureBtn:document.getElementById("captureBtn"), resetBtn:document.getElementById("resetBtn"),
+    captureBtn:document.getElementById("captureBtn"), captureStageSelect:document.getElementById("captureStageSelect"), resetBtn:document.getElementById("resetBtn"),
     startMobileSessionBtn:document.getElementById("startMobileSessionBtn"), renewMobileSessionBtn:document.getElementById("renewMobileSessionBtn"), copyMobileLinkBtn:document.getElementById("copyMobileLinkBtn"),
     mobileSessionPill:document.getElementById("mobileSessionPill"), mobileSessionCode:document.getElementById("mobileSessionCode"), mobileSessionStatus:document.getElementById("mobileSessionStatus"), mobileSessionNote:document.getElementById("mobileSessionNote"), mobileQrCanvas:document.getElementById("mobileQrCanvas")
   };
@@ -57,9 +59,13 @@
   }
   function renderCurrent(){
     const team = A.getTeam(state.currentTeamId);
+    const roundText = `ครั้งที่ ${Math.min(state.confirmed.length + 1, 7)} จาก 7`;
+    els.currentRound.textContent = roundText;
     els.currentPosition.textContent = state.currentPosition || "—";
     els.currentTeam.textContent = team ? `${team.id}. ${team.name}` : "รอจับฉลาก";
     els.currentStatus.textContent = state.currentPosition && team ? "พร้อมยืนยันผลลงตาราง" : state.currentPosition ? "จับโถที่ 2 และเลือกหมายเลขทีม" : "จับโถที่ 1 และเลือกตำแหน่งการแข่งขัน";
+    const highlighted = Boolean(team && state.pendingRevealUntil > Date.now());
+    els.currentTeam.closest(".current-pair")?.classList.toggle("is-highlighted", highlighted);
   }
   function renderHistory(){
     els.historyList.innerHTML = state.confirmed.length ? state.confirmed.map((item, index) => {
@@ -173,9 +179,11 @@
     els.modePill.textContent = live ? "โหมดถ่ายทอดสด" : "โหมดซ้อม"; els.modePill.className = `pill ${live ? "live" : ""}`; els.rehearsalRandomBtn.hidden = live;
     [els.positionSelect, els.teamSelect, els.confirmBtn, els.clearCurrentBtn, els.undoBtn, els.rehearsalRandomBtn].forEach(el => { el.disabled = state.locked; });
     els.lockBtn.textContent = state.locked ? "🔓 ปลดล็อกผล" : "🔒 ล็อกผล"; els.lockedAlert.hidden = !state.locked;
-    els.progressPill.textContent = `${state.confirmed.length} / 7 ทีม`; els.stateTime.textContent = `บันทึกล่าสุด ${A.formatThaiTime(state.updatedAt)}`;
+    els.progressPill.textContent = `ครั้งที่ ${Math.min(state.confirmed.length + 1, 7)} จาก 7`; els.stateTime.textContent = `บันทึกล่าสุด ${A.formatThaiTime(state.updatedAt)}`;
     els.confirmBtn.disabled = state.locked || !state.currentPosition || !state.currentTeamId; els.undoBtn.disabled = state.locked || !state.confirmed.length;
     renderConnection(); renderReadiness(); renderMobileSession(); renderFirebaseStatus();
+    clearTimeout(highlightTimer);
+    if(state.pendingRevealUntil > Date.now()) highlightTimer = setTimeout(render, state.pendingRevealUntil - Date.now() + 30);
   }
   els.openDisplayBtn.addEventListener("click", () => window.open(displayLink(), "rapee69-display"));
   els.startMobileSessionBtn.addEventListener("click", () => startMobileSession(false));
@@ -188,7 +196,21 @@
     try { await navigator.clipboard.writeText(link); alert("คัดลอกลิงก์ควบคุมมือถือแล้ว"); }
     catch { prompt("คัดลอกลิงก์นี้", link); }
   });
-  document.querySelectorAll("[data-stage]").forEach(button => button.addEventListener("click", () => { state.stage = button.dataset.stage; persist(`เปลี่ยนหน้าจอเป็น ${button.textContent.trim()}`); }));
+  function focusDrawWorkflow(){
+    const target = document.getElementById("drawWorkflow");
+    if(!target) return;
+    target.scrollIntoView({ behavior:"smooth", block:"center" });
+    target.classList.remove("draw-workflow-focus");
+    void target.offsetWidth;
+    target.classList.add("draw-workflow-focus");
+    clearTimeout(drawFocusTimer);
+    drawFocusTimer = setTimeout(() => target.classList.remove("draw-workflow-focus"), 3000);
+  }
+  document.querySelectorAll("[data-stage]").forEach(button => button.addEventListener("click", () => {
+    state.stage = button.dataset.stage;
+    persist(`เปลี่ยนหน้าจอเป็น ${button.textContent.trim()}`);
+    if(button.dataset.stage === "draw") requestAnimationFrame(focusDrawWorkflow);
+  }));
   els.positionSelect.addEventListener("change", () => {
     const value = els.positionSelect.value;
     if(!value) return;
@@ -199,7 +221,7 @@
     const id = Number(els.teamSelect.value), team = A.getTeam(id);
     if(!team) return;
     if(usedTeams().has(id) && id !== Number(state.currentTeamId)) return alert("ทีมนี้ถูกใช้แล้ว");
-    state.currentTeamId = id; state.stage = "draw"; state.pendingRevealUntil = 0; persist(`เลือกทีมหมายเลข ${id}`);
+    state.currentTeamId = id; state.stage = "draw"; state.pendingRevealUntil = Date.now() + 5000; persist(`เลือกทีมหมายเลข ${id}`);
   });
   els.confirmBtn.addEventListener("click", () => {
     const team = A.getTeam(state.currentTeamId);
@@ -240,7 +262,7 @@
   });
   els.downloadJsonBtn.addEventListener("click", () => { const blob = new Blob([JSON.stringify(state, null, 2)], { type:"application/json" }), url = URL.createObjectURL(blob), a = document.createElement("a"); a.href = url; a.download = `rapee69-draw-backup-${new Date().toISOString().slice(0,19).replaceAll(":","-")}.json`; a.click(); URL.revokeObjectURL(url); });
   els.printBtn.addEventListener("click", () => { const url = new URL(displayLink()); url.searchParams.set("print", "1"); url.searchParams.set("stage", "official"); window.open(url, "_blank"); });
-  els.captureBtn.addEventListener("click", () => { const url = new URL(displayLink()); url.searchParams.set("capture", "1"); url.searchParams.set("stage", "official"); window.open(url, "_blank"); });
+  els.captureBtn.addEventListener("click", () => { const url = new URL(displayLink()); url.searchParams.set("capture", "1"); url.searchParams.set("stage", els.captureStageSelect.value); window.open(url, "_blank"); });
   els.resetBtn.addEventListener("click", () => { if(prompt("พิมพ์คำว่า RESET เพื่อยืนยันล้างข้อมูลทั้งหมด") !== "RESET") return; state = A.emptyState(); persist("รีเซ็ตระบบทั้งหมด"); });
   if(window.drawChannel) window.drawChannel.addEventListener("message", event => { if(event.data?.type === "display-presence") { lastDisplayPing = Date.now(); render(); } else if(event.data?.state) receive(event.data.state); });
   window.addEventListener("storage", event => { if(event.key === A.STORAGE_KEY) receive(A.loadState()); });

@@ -111,7 +111,7 @@
 
   function drawSlide(){
     const team = A.getTeam(state.currentTeamId);
-    const revealing = team && Date.now() < state.pendingRevealUntil;
+    const highlighting = team && Date.now() < state.pendingRevealUntil;
     const last = state.confirmed[state.confirmed.length - 1];
     const lastTeam = last ? A.getTeam(last.teamId) : null;
     let status = "พร้อมเริ่มการจับฉลาก";
@@ -123,11 +123,11 @@
     return `
       <section class="slide">
         <div class="slide-inner draw-display">
-          <div class="live-result">
+          <div class="live-result ${highlighting ? "is-highlighted" : ""}">
             <div class="progress-label">ครั้งที่ ${Math.min(state.confirmed.length + 1, 7)} จาก 7</div>
             <div class="big-position">${state.currentPosition || "—"}</div>
-            <div class="big-team ${revealing ? "revealing" : ""}">${team ? (revealing ? "กำลังเปิดฉลาก…" : A.escapeHtml(team.name)) : "รอผลจากโถจริง"}</div>
-            <div class="live-status">${revealing ? "กำลังเปิดฉลาก…" : status}</div>
+            <div class="big-team ${highlighting ? "revealing" : ""}">${team ? A.escapeHtml(team.name) : "รอผลจากโถจริง"}</div>
+            <div class="live-status">${status}</div>
           </div>
           <div class="display-board">
             ${groupBoardHtml()}
@@ -168,7 +168,7 @@
     const status = state.locked
       ? '<span class="official-status locked">ยืนยันและล็อกผลแล้ว</span>'
       : complete
-        ? '<span class="official-status review">จับฉลากครบแล้ว • รอตรวจสอบและล็อกผล</span>'
+        ? '<span class="official-status review">รอตรวจสอบ</span>'
         : `<span class="official-status progress">ดำเนินการแล้ว ${state.confirmed.length} จาก 7 ทีม</span>`;
     const confirmedTime = last ? `ยืนยันผลล่าสุด เวลา ${A.formatThaiTime(last.confirmedAt)} น.` : "รอเริ่มการจับฉลาก";
     return `
@@ -327,23 +327,32 @@
   }
 
   function scheduleSlide(){
-    const rows = A.buildScheduleRows(state)
-      .map(row => `<tr>${row.map(cell => `<td>${A.escapeHtml(cell)}</td>`).join("")}</tr>`)
-      .join("");
+    const rows = A.buildScheduleRows(state);
+    const column = (title, tone, list) => `
+      <section class="schedule-column ${tone}">
+        <header><h2>${title}</h2><span>${list.length} นัด</span></header>
+        <div class="schedule-match-list">${list.map(row => `
+          <article class="schedule-match">
+            <div class="schedule-time">${A.escapeHtml(row[1])}</div>
+            <div class="schedule-match-title">${A.escapeHtml(row[3])}</div>
+            <div class="schedule-pair">${A.escapeHtml(row[4])}</div>
+          </article>`).join("")}
+        </div>
+      </section>`;
+    const groupA = rows.filter(row => row[2] === "สาย A");
+    const groupB = rows.filter(row => row[2] === "สาย B");
+    const finals = rows.filter(row => row[2] === "รอบรองฯ");
     return `
       <section class="slide">
-        <div class="slide-inner">
-          <h1 style="font-size:clamp(28px,4vw,54px); margin-bottom:6px">ตารางแข่งขัน สาย A และ สาย B</h1>
-          <p class="slide-subtitle" style="margin:0 0 12px">โปรแกรมการแข่งขันและรูปแบบ Play-off ฉบับเต็ม</p>
-          <table class="schedule-table">
-            <thead>
-              <tr><th>ลำดับ</th><th>เวลา</th><th>สาย/รอบ</th><th>รายการ</th><th>คู่แข่งขัน</th></tr>
-            </thead>
-            <tbody>${rows}</tbody>
-          </table>
-          <div class="last-result-bar">
-            <div class="last-result-label">สรุปจำนวนการแข่งขัน</div>
-            <div class="last-result-team">สาย A 3 นัด + สาย B 5 นัด + รอบรองชนะเลิศ 2 นัด = รวม 10 นัด</div>
+        <div class="slide-inner schedule-slide">
+          <header class="schedule-header">
+            <div><div class="official-kicker">ผลการแบ่งสายการแข่งขันฟุตบอล 7 คน</div><h1>ตารางแข่งขัน</h1></div>
+            <p>เวลาแข่งขัน สาย A · สาย B · รอบรองชนะเลิศ</p>
+          </header>
+          <div class="schedule-columns">
+            ${column("สาย A", "a", groupA)}
+            ${column("สาย B", "b", groupB)}
+            ${column("รอบรองชนะเลิศ", "final", finals)}
           </div>
         </div>
       </section>`;

@@ -47,7 +47,7 @@
     if (!canControl() || !team || state.locked || (usedTeams().has(teamId) && Number(state.currentTeamId) !== teamId)) return;
     state.currentTeamId = teamId;
     state.stage = "draw";
-    state.pendingRevealUntil = 0;
+    state.pendingRevealUntil = Date.now() + 5000;
     persist(`มือถือเลือกทีมหมายเลข ${teamId}`);
   }
 
