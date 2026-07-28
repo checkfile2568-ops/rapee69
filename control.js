@@ -36,6 +36,7 @@
   };
   const usedPositions = () => new Set(state.confirmed.map(item => item.position));
   const usedTeams = () => new Set(state.confirmed.map(item => Number(item.teamId)));
+  const cloudSyncEnabled = () => Boolean(window.DrawFirebase?.enabled || window.DrawRemote?.enabled);
   function updateControlClock(){
     if(!controlClock) return;
     const now = new Date();
@@ -67,7 +68,7 @@
     const connected = displayConnected();
     els.connectionPill.textContent = connected ? "● จอนำเสนอเชื่อมต่อแล้ว" : "● ไม่พบจอนำเสนอ";
     els.connectionPill.className = `pill ${connected ? "ok" : "offline"}`;
-    els.connectionPill.title = window.DrawRemote?.enabled ? (remoteOnline ? "ตรวจผ่านการซิงก์ข้ามเครื่อง" : "กำลังเชื่อมต่อบริการซิงก์") : "ตรวจจากจอที่เปิดในเบราว์เซอร์/เครื่องเดียวกัน";
+    els.connectionPill.title = window.DrawFirebase?.enabled ? "ซิงก์ผ่าน Firebase Realtime Database" : (window.DrawRemote?.enabled ? (remoteOnline ? "ตรวจผ่านการซิงก์ข้ามเครื่อง" : "กำลังเชื่อมต่อบริการซิงก์") : "ตรวจจากจอที่เปิดในเบราว์เซอร์/เครื่องเดียวกัน");
   }
   function renderReadiness(){
     const checks = [
@@ -108,15 +109,15 @@
   }
   function mobileAge(){ return lastMobilePing ? Math.max(0, Math.round((Date.now() - lastMobilePing) / 1000)) : null; }
   function renderMobileSession(){
-    const ready = Boolean(window.DrawRemote?.enabled);
+    const ready = cloudSyncEnabled();
     const link = mobileLink();
     els.mobileSessionCode.textContent = mobileSession?.room || "ยังไม่ได้เริ่มรอบ";
     els.copyMobileLinkBtn.disabled = !link;
     els.renewMobileSessionBtn.disabled = !ready;
     if(!ready){
-      els.mobileSessionPill.className = "pill offline"; els.mobileSessionPill.textContent = "ต้องตั้งค่า Apps Script";
+      els.mobileSessionPill.className = "pill offline"; els.mobileSessionPill.textContent = "ต้องตั้งค่า Firebase หรือ Apps Script";
       els.mobileSessionStatus.textContent = "ยังไม่พร้อมเชื่อมข้ามเครือข่าย";
-      els.mobileSessionNote.innerHTML = "ใส่ URL ที่ลงท้ายด้วย <code>/exec</code> ใน <code>sync-config.js</code> ก่อน แล้วรีเฟรชหน้านี้";
+      els.mobileSessionNote.innerHTML = "ตั้งค่า Firebase ใน <code>firebase-config.js</code> หรือใส่ URL ที่ลงท้ายด้วย <code>/exec</code> ใน <code>sync-config.js</code> ก่อน แล้วรีเฟรชหน้านี้";
       drawQr("");
       return;
     }
@@ -144,12 +145,12 @@
     drawQr(link);
   }
   function startMobileSession(newSession = false){
-    if(!window.DrawRemote?.enabled) return alert("ยังไม่ได้ตั้งค่า Apps Script ใน sync-config.js");
+    if(!cloudSyncEnabled()) return alert("ยังไม่ได้ตั้งค่า Firebase หรือ Apps Script");
     if(newSession || !mobileSession){
       mobileSession = { room:createRoom(), createdAt:Date.now() };
       localStorage.setItem(MOBILE_SESSION_STORAGE_KEY, JSON.stringify(mobileSession));
     }
-    window.DrawRemote.configure({ room:mobileSession.room });
+    window.DrawRemote?.configure?.({ room:mobileSession.room });
     persist(`เปิดรอบควบคุมมือถือ ${mobileSession.room}`);
   }
   function render(){
