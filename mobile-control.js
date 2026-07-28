@@ -53,7 +53,7 @@
     const firebaseConfigured = Boolean(window.DrawFirebase?.enabled || firebaseStatus.enabled);
     if (firebaseConfigured) {
       els.syncPill.className = `mobile-sync ${firebaseStatus.online ? "online" : "offline"}`;
-      els.syncPill.textContent = firebaseStatus.online ? "● ซิงก์มือถือพร้อม" : "● Firebase กำลังเชื่อมต่อ";
+      els.syncPill.textContent = firebaseStatus.online ? "● Firebase Realtime API SDK ออนไลน์" : "● Firebase Realtime API SDK กำลังเชื่อมต่อ";
       els.hint.textContent = firebaseStatus.online ? "คำสั่งจากหน้านี้จะส่งไปยังคอมและจอนำเสนอทันที" : "ตรวจสอบอินเทอร์เน็ตและค่า Firebase หากสถานะไม่เปลี่ยนเป็นสีเขียว";
       return;
     }

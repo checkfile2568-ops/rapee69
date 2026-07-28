@@ -5,6 +5,7 @@
   let lastDisplayPing = 0;
   let lastMobilePing = 0;
   let remoteOnline = false;
+  let firebaseStatus = { enabled: Boolean(window.DrawFirebase?.enabled), online: false, error: "" };
   const MOBILE_SESSION_STORAGE_KEY = "rapee69_mobile_session_v16";
   let qrLinkRendered = "";
   function cleanRoom(value){ return String(value || "").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 64); }
@@ -28,7 +29,7 @@
     undoBtn:document.getElementById("undoBtn"), lockBtn:document.getElementById("lockBtn"), modeBtn:document.getElementById("modeBtn"), rehearsalRandomBtn:document.getElementById("rehearsalRandomBtn"),
     currentPosition:document.getElementById("currentPosition"), currentTeam:document.getElementById("currentTeam"), currentStatus:document.getElementById("currentStatus"), groupASlots:document.getElementById("groupASlots"),
     groupBSlots:document.getElementById("groupBSlots"), historyList:document.getElementById("historyList"), scheduleBody:document.getElementById("scheduleBody"), progressPill:document.getElementById("progressPill"),
-    modePill:document.getElementById("modePill"), connectionPill:document.getElementById("connectionPill"), readinessList:document.getElementById("readinessList"), stateTime:document.getElementById("stateTime"),
+    modePill:document.getElementById("modePill"), connectionPill:document.getElementById("connectionPill"), readinessList:document.getElementById("readinessList"), stateTime:document.getElementById("stateTime"), firebaseStatus:document.getElementById("controlFirebaseStatus"),
     lockedAlert:document.getElementById("lockedAlert"), copySummaryBtn:document.getElementById("copySummaryBtn"), downloadJsonBtn:document.getElementById("downloadJsonBtn"), printBtn:document.getElementById("printBtn"),
     captureBtn:document.getElementById("captureBtn"), resetBtn:document.getElementById("resetBtn"),
     startMobileSessionBtn:document.getElementById("startMobileSessionBtn"), renewMobileSessionBtn:document.getElementById("renewMobileSessionBtn"), copyMobileLinkBtn:document.getElementById("copyMobileLinkBtn"),
@@ -107,6 +108,13 @@
       els.mobileQrCanvas.append(error);
     }
   }
+  function renderFirebaseStatus(){
+    if(!els.firebaseStatus) return;
+    const configured = Boolean(window.DrawFirebase?.enabled || firebaseStatus.enabled);
+    els.firebaseStatus.className = `firebase-status ${firebaseStatus.online ? "online" : configured ? "checking" : "offline"}`;
+    els.firebaseStatus.textContent = firebaseStatus.online ? "● Firebase Realtime API SDK ออนไลน์" : configured ? "● Firebase Realtime API SDK กำลังเชื่อมต่อ" : "● Firebase Realtime API SDK ไม่ได้ตั้งค่า";
+    els.firebaseStatus.title = firebaseStatus.error || "";
+  }
   function mobileAge(){ return lastMobilePing ? Math.max(0, Math.round((Date.now() - lastMobilePing) / 1000)) : null; }
   function renderMobileSession(){
     const ready = cloudSyncEnabled();
@@ -165,7 +173,7 @@
     els.lockBtn.textContent = state.locked ? "🔓 ปลดล็อกผล" : "🔒 ล็อกผล"; els.lockedAlert.hidden = !state.locked;
     els.progressPill.textContent = `${state.confirmed.length} / 7 ทีม`; els.stateTime.textContent = `บันทึกล่าสุด ${A.formatThaiTime(state.updatedAt)}`;
     els.confirmBtn.disabled = state.locked || !state.currentPosition || !state.currentTeamId; els.undoBtn.disabled = state.locked || !state.confirmed.length;
-    renderConnection(); renderReadiness(); renderMobileSession();
+    renderConnection(); renderReadiness(); renderMobileSession(); renderFirebaseStatus();
   }
   els.openDisplayBtn.addEventListener("click", () => window.open(displayLink(), "rapee69-display"));
   els.startMobileSessionBtn.addEventListener("click", () => startMobileSession(false));
@@ -239,6 +247,7 @@
     receive(event.detail.state);
   });
   window.addEventListener("draw-firebase-state", event => receive(event.detail.state));
+  window.addEventListener("draw-firebase-status", event => { firebaseStatus = event.detail || firebaseStatus; render(); });
   window.addEventListener("draw-remote-status", event => {
     if(mobileSession && event.detail.room && event.detail.room !== mobileSession.room) return;
     remoteOnline = Boolean(event.detail.online);

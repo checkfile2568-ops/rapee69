@@ -412,6 +412,10 @@ h1,h2,h3,.display-title,.group-head,.format-big,.big-position,.big-team,
 .brand-copy .header-meta{
   margin-top:3px;
 }
+.firebase-status{display:inline-flex;align-items:center;width:max-content;max-width:100%;margin-top:4px;padding:2px 7px;border:1px solid rgba(245,220,140,.42);border-radius:999px;color:#f8edbf;font-size:11px;font-weight:800;line-height:1.25}
+.firebase-status.online{border-color:#8cdaa4;background:rgba(28,137,72,.25);color:#c9f5d6}
+.firebase-status.checking{border-color:#ead18b;background:rgba(220,168,45,.16);color:#fff0ba}
+.firebase-status.offline{border-color:#f0a6a0;background:rgba(163,37,35,.22);color:#ffd3ce}
 
 .display-title{
   color:#fff;
@@ -419,13 +423,15 @@ h1,h2,h3,.display-title,.group-head,.format-big,.big-position,.big-team,
 }
 .display-meta{
   margin-left:auto;
-  display:flex;align-items:center;gap:8px;
+  display:flex;flex-direction:column;align-items:flex-end;gap:4px;
   border:1px solid rgba(245,220,140,.48);
   background:rgba(255,255,255,.06);
   padding:7px 12px;
   border-radius:999px;
 }
-.display-meta #liveClock{padding-left:8px;border-left:1px solid rgba(245,220,140,.45);font-variant-numeric:tabular-nums}
+.display-datetime{display:flex;align-items:center;gap:8px}
+.display-datetime #liveClock{padding-left:8px;border-left:1px solid rgba(245,220,140,.45);font-variant-numeric:tabular-nums}
+.display-meta .firebase-status{margin-top:0;font-size:10px}
 .keyboard-hint{margin-top:12px;color:var(--navy-800);font-size:14px;font-weight:700}
 .keyboard-hint strong{display:inline-grid;place-items:center;min-width:25px;padding:1px 5px;border-radius:5px;background:#e9eef7;color:var(--navy-950)}
 

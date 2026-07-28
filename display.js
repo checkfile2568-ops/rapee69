@@ -5,9 +5,19 @@
   const displayMain = document.getElementById("displayMain");
   const liveDate = document.getElementById("liveDate");
   const liveClock = document.getElementById("liveClock");
+  const displayFirebaseStatus = document.getElementById("displayFirebaseStatus");
+  let firebaseStatus = { enabled: Boolean(window.DrawFirebase?.enabled), online: false, error: "" };
   const params = new URLSearchParams(location.search);
   const forcedStage = A.STAGES.includes(params.get("stage")) ? params.get("stage") : "";
   let revealTimer;
+
+  function renderFirebaseStatus(){
+    if(!displayFirebaseStatus) return;
+    const configured = Boolean(window.DrawFirebase?.enabled || firebaseStatus.enabled);
+    displayFirebaseStatus.className = `firebase-status ${firebaseStatus.online ? "online" : configured ? "checking" : "offline"}`;
+    displayFirebaseStatus.textContent = firebaseStatus.online ? "● Firebase Realtime API SDK ออนไลน์" : configured ? "● Firebase Realtime API SDK กำลังเชื่อมต่อ" : "● Firebase Realtime API SDK ไม่ได้ตั้งค่า";
+    displayFirebaseStatus.title = firebaseStatus.error || "";
+  }
 
   const teamListHtml = A.TEAMS.map(team => `
     <div class="team-number"><b>${team.id}</b><span>${A.escapeHtml(team.name)}</span></div>
@@ -342,6 +352,7 @@
     state = A.normalizeState(event.detail.state); render();
   });
   window.addEventListener("draw-firebase-state", event => { state = A.normalizeState(event.detail.state); render(); });
+  window.addEventListener("draw-firebase-status", event => { firebaseStatus = event.detail || firebaseStatus; renderFirebaseStatus(); });
   function pingDisplay(){
     window.drawChannel?.postMessage({ type:"display-presence", at:Date.now() });
     window.DrawRemote?.ping?.("display");
@@ -363,6 +374,7 @@
   window.DrawRemote?.start?.("display");
   pingDisplay(); setInterval(pingDisplay, 2000);
   updateClock(); setInterval(updateClock, 1000);
+  renderFirebaseStatus();
   render();
   if(params.get("print") === "1") setTimeout(() => window.print(), 600);
   if(params.get("capture") === "1") setTimeout(() => captureSummary(), 800);
