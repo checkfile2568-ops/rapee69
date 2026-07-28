@@ -49,8 +49,8 @@
     const positions = A.POSITIONS.filter(position => !usedPositions.has(position));
     const teams = A.TEAMS.filter(team => !usedTeams.has(team.id));
     return `<section class="remaining-draw" aria-label="ฉลากที่เหลือ">
-      <div><strong>ตำแหน่งที่เหลือในโถ</strong><span>${positions.map(item => `<b>${item}</b>`).join("") || "ครบแล้ว"}</span></div>
-      <div><strong>หมายเลขทีมที่เหลือในโถ</strong><span>${teams.map(team => `<b>${team.id}</b>`).join("") || "ครบแล้ว"}</span></div>
+      <div class="remaining-card positions"><strong>ตำแหน่งที่เหลือในโถ</strong><span>${positions.map(item => `<b class="${item.startsWith("A") ? "a" : "b"}">${item}</b>`).join("") || "ครบแล้ว"}</span></div>
+      <div class="remaining-card teams"><strong>หมายเลขทีมที่เหลือในโถ</strong><span>${teams.map(team => `<b>${team.id}</b>`).join("") || "ครบแล้ว"}</span></div>
     </section>`;
   }
 
@@ -138,7 +138,7 @@
           </div>
           <div class="display-board">
             ${groupBoardHtml()}
-            <div class="last-result-bar">
+            <div class="last-result-bar ${last?.position?.startsWith("A") ? "result-a" : last?.position?.startsWith("B") ? "result-b" : ""}">
               ${last && lastTeam ? `
                 <div class="last-result-label">ผลล่าสุด: ${last.position}</div>
                 <div class="last-result-team">${A.escapeHtml(lastTeam.name)}</div>
