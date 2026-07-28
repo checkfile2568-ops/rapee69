@@ -423,10 +423,8 @@ h1,h2,h3,.display-title,.group-head,.format-big,.big-position,.big-team,
 .brand-copy .header-meta{
   margin-top:3px;
 }
-.firebase-status{display:inline-flex;align-items:center;width:max-content;max-width:100%;margin-top:4px;padding:2px 7px;border:1px solid rgba(245,220,140,.42);border-radius:999px;color:#f8edbf;font-size:11px;font-weight:800;line-height:1.25}
-.firebase-status.online{border-color:#8cdaa4;background:rgba(28,137,72,.25);color:#c9f5d6}
-.firebase-status.checking{border-color:#ead18b;background:rgba(220,168,45,.16);color:#fff0ba}
-.firebase-status.offline{border-color:#f0a6a0;background:rgba(163,37,35,.22);color:#ffd3ce}
+.firebase-status{display:inline-flex;align-items:center;width:max-content;max-width:100%;margin-top:4px;padding:0;border:0;border-radius:0;background:transparent;color:#f8edbf;font-size:clamp(11px,.9vw,13px);font-weight:900;line-height:1.35;letter-spacing:.02em;text-shadow:0 1px 5px rgba(0,0,0,.24)}
+.firebase-status.online{background:transparent;color:#c9f5d6}.firebase-status.checking{background:transparent;color:#fff0ba}.firebase-status.offline{background:transparent;color:#ffd3ce}
 .typing-online span{display:inline-block;animation:firebase-letter 3.8s ease-in-out infinite;animation-delay:calc(var(--letter) * 95ms);will-change:opacity,text-shadow}
 @keyframes firebase-letter{0%,100%{opacity:.58;text-shadow:none}46%,58%{opacity:1;text-shadow:0 0 7px currentColor}}
 @keyframes crest-orbit{0%,100%{transform:scale(.94);opacity:.45}50%{transform:scale(1.05);opacity:.95}}
@@ -720,6 +718,8 @@ h1,h2,h3,.display-title,.group-head,.format-big,.big-position,.big-team,
 .official-slot-code{display:grid;place-items:center;align-self:stretch;border-radius:9px;background:var(--premium-navy);color:#fff;font-family:"Kanit","Sarabun",sans-serif;font-size:clamp(22px,2.3vw,36px);font-weight:900;line-height:1}
 .official-slot-name{min-width:0;color:var(--premium-navy);font-size:clamp(17px,1.65vw,28px);font-weight:900;line-height:1.13;overflow-wrap:anywhere;word-break:break-word}
 .official-slot.empty{border-left-color:#c9d1dc;background:#f4f5f7}.official-slot.empty .official-slot-code{background:#9aa5b4}.official-slot.empty .official-slot-name{color:#8b95a3}
+.official-group.a .official-slot{border-left-color:#f06b28}.official-group.a .official-slot-code,.official-group.a .official-slot.empty .official-slot-code{background:linear-gradient(145deg,#bd4310,#ff7c32)}
+.official-group.b .official-slot{border-left-color:#159349}.official-group.b .official-slot-code,.official-group.b .official-slot.empty .official-slot-code{background:linear-gradient(145deg,#06682b,#25a957)}
 .official-footer{padding-top:clamp(8px,1vw,14px);border-top:1px solid rgba(13,50,111,.16);color:#536176;font-size:clamp(13px,1.15vw,18px);font-weight:700;text-align:center}
 .group-summary-slide{display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:clamp(10px,1vw,18px);padding:clamp(14px,1.8vw,28px);overflow:hidden;background:radial-gradient(circle at 8% 4%,rgba(245,220,140,.24),transparent 20rem),linear-gradient(145deg,#f7faff,#fffdf7 54%,#f4efe1)}
 .group-summary-slide .official-grid{min-height:0}.group-summary-slide .official-slot-name{font-size:clamp(16px,1.6vw,27px)}
@@ -792,9 +792,8 @@ h1,h2,h3,.display-title,.group-head,.format-big,.big-position,.big-team,
 .mobile-brand .mini-crest strong{font-size:22px}
 .mobile-kicker,.mobile-eyebrow{color:var(--premium-blue);font-size:12px;font-weight:900;letter-spacing:.05em;text-transform:uppercase}
 .mobile-brand h1{font-size:clamp(22px,7vw,30px);color:var(--premium-navy);margin:1px 0 0;line-height:1.1}
-.mobile-sync{justify-self:stretch;display:block;padding:9px 12px;border:1px solid #d8dfec;border-radius:999px;text-align:center;font-weight:800;font-size:14px;background:#f5f7fb;color:var(--muted)}
-.mobile-sync.online{background:#eaf7ee;border-color:#83d59d;color:#08752d}
-.mobile-sync.offline{background:#fff6df;border-color:#ebd491;color:#8a6500}
+.mobile-sync{justify-self:stretch;display:block;padding:2px 0;border:0;border-radius:0;text-align:center;font-weight:900;font-size:clamp(14px,4vw,16px);line-height:1.35;background:transparent;color:var(--muted);letter-spacing:.01em}
+.mobile-sync.online{background:transparent;color:#08752d}.mobile-sync.offline{background:transparent;color:#8a6500}
 .mobile-card{margin:13px 0;padding:15px;border:1px solid rgba(13,50,111,.15);border-radius:18px;background:rgba(255,255,255,.97);box-shadow:0 10px 26px rgba(8,25,58,.09)}
 .mobile-stage-card{padding-bottom:14px}
 .mobile-section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}

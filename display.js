@@ -166,7 +166,7 @@
     const complete = state.confirmed.length === A.POSITIONS.length;
     const last = state.confirmed.at(-1);
     const status = state.locked
-      ? '<span class="official-status locked">ยืนยันและล็อกผลแล้ว</span>'
+      ? '<span class="official-status locked">ผลการแบ่งสาย</span>'
       : complete
         ? '<span class="official-status review">รอตรวจสอบ</span>'
         : `<span class="official-status progress">ดำเนินการแล้ว ${state.confirmed.length} จาก 7 ทีม</span>`;
