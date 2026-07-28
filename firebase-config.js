@@ -8,13 +8,13 @@
   Firebase Rules and disable public access after the event.
 */
 window.DRAW_FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  databaseURL: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyCkyGSGKhsIqLffH0uODZdOVfXeLOORF-U",
+  authDomain: "court-media-controller.firebaseapp.com",
+  databaseURL: "https://court-media-controller-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "court-media-controller",
+  storageBucket: "court-media-controller.firebasestorage.app",
+  messagingSenderId: "827702442673",
+  appId: "1:827702442673:web:71423a035b3d5e2edb4090"
 };
 
 // Use the same unique path on the phone, control computer, and display.
