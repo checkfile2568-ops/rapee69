@@ -1,12 +1,12 @@
 (() => {
   "use strict";
 
-  const VERSION = "1.6";
+  const VERSION = "1.7";
   // Keep the v1.4 key/channel so an existing control computer retains its saved draw.
-  // v1.6 adds a one-session QR bridge for the same draw state.
+  // v1.7 keeps the one-session QR bridge and adds an official full-screen draw summary.
   const STORAGE_KEY = "rapee69_draw_state_v14";
   const CHANNEL_NAME = "rapee69_draw_channel_v14";
-  const STAGES = ["intro", "format", "draw", "summary", "schedule"];
+  const STAGES = ["intro", "format", "draw", "official", "summary", "schedule"];
   const MODES = ["live", "rehearsal"];
   const TEAMS = [
     { id: 1, name: "ทีมรวมศาลจังหวัดลพบุรี" }, { id: 2, name: "ทีมอัยการ" },

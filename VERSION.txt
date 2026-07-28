@@ -1,1 +1,1 @@
-Rapee69 Draw System v1.6 — One-session QR mobile control with Apps Script sync
+Rapee69 Draw System v1.7 — Official draw-result display and soft confirmation highlight

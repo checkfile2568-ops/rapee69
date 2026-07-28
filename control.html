@@ -7,14 +7,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=1.6.0" />
+  <link rel="stylesheet" href="styles.css?v=1.7.0" />
 </head>
 <body>
   <header class="app-header">
     <div class="brand-lockup">
       <div class="mini-crest">รพี<br><strong>69</strong></div>
       <div class="brand-copy">
-        <div class="app-kicker">ศาลจังหวัดลพบุรี <span class="version-chip">v1.6</span></div>
+        <div class="app-kicker">ศาลจังหวัดลพบุรี <span class="version-chip">v1.7</span></div>
         <h1>หน้าควบคุมการจับฉลากฟุตบอล 7 คน</h1>
         <div id="controlClock" class="header-meta">วันที่ -- · เวลา --:--:-- น.</div>
       </div>
@@ -40,10 +40,11 @@
           <button class="btn stage" data-stage="intro">1. หน้าต้อนรับ</button>
           <button class="btn stage" data-stage="format">2. รูปแบบแข่งขัน</button>
           <button class="btn stage" data-stage="draw">3. จับฉลาก</button>
-          <button class="btn stage" data-stage="summary">4. สรุป/ผังแข่งขัน</button>
-          <button class="btn stage" data-stage="schedule">5. ตารางแข่งขัน</button>
+          <button class="btn stage" data-stage="official">4. ผลการจับฉลาก</button>
+          <button class="btn stage" data-stage="summary">5. สรุป/ผังแข่งขัน</button>
+          <button class="btn stage" data-stage="schedule">6. ตารางแข่งขัน</button>
         </div>
-        <div class="keyboard-hint">คีย์ลัดหน้าจอนำเสนอ: <strong>1–5</strong> เปลี่ยนหน้า · <strong>F</strong> เต็มจอ</div>
+        <div class="keyboard-hint">คีย์ลัดหน้าจอนำเสนอ: <strong>1–6</strong> เปลี่ยนหน้า · <strong>F</strong> เต็มจอ</div>
       </div>
     </section>
 
@@ -188,7 +189,7 @@
               <button class="btn red" id="resetBtn">รีเซ็ตทั้งหมด</button>
             </div>
             <div class="alert warning">
-              เวอร์ชัน 1.6: พิมพ์และบันทึกภาพจะใช้หน้าสรุปเสมอ
+              เวอร์ชัน 1.7: พิมพ์และบันทึกภาพจะใช้หน้าผลการจับฉลากอย่างเป็นทางการ
             </div>
           </div>
         </section>
@@ -196,12 +197,12 @@
     </div>
   </main>
 
-  <script src="sync-config.js?v=1.6.0"></script>
-  <script src="firebase-config.js?v=1.6.0"></script>
-  <script src="remote-sync.js?v=1.6.0"></script>
+  <script src="sync-config.js?v=1.7.0"></script>
+  <script src="firebase-config.js?v=1.7.0"></script>
+  <script src="remote-sync.js?v=1.7.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
-  <script src="app.js?v=1.6.0"></script>
-  <script type="module" src="firebase-sync.js?v=1.6.0"></script>
-  <script src="control.js?v=1.6.0"></script>
+  <script src="app.js?v=1.7.0"></script>
+  <script type="module" src="firebase-sync.js?v=1.7.0"></script>
+  <script src="control.js?v=1.7.0"></script>
 </body>
 </html>

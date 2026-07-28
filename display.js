@@ -130,6 +130,51 @@
       </section>`;
   }
 
+  function officialGroupHtml(group, description){
+    const teams = A.getPairMap(state);
+    const newest = state.confirmed.at(-1)?.position;
+    const slots = A.POSITIONS.filter(position => position.startsWith(group)).map(position => {
+      const team = teams[position];
+      return `<div class="official-slot ${team ? "" : "empty"}${team && position === newest ? " just-added" : ""}">
+        <div class="official-slot-code">${position}</div>
+        <div class="official-slot-name">${team ? A.escapeHtml(team.name) : "รอจับฉลาก"}</div>
+      </div>`;
+    }).join("");
+    return `<section class="official-group ${group === "A" ? "a" : "b"}">
+      <div class="official-group-head"><div>สาย ${group}</div><span>${description}</span></div>
+      <div class="official-slot-list">${slots}</div>
+    </section>`;
+  }
+
+  function officialSlide(){
+    const complete = state.confirmed.length === A.POSITIONS.length;
+    const last = state.confirmed.at(-1);
+    const status = state.locked
+      ? '<span class="official-status locked">ยืนยันและล็อกผลแล้ว</span>'
+      : complete
+        ? '<span class="official-status review">จับฉลากครบแล้ว • รอตรวจสอบและล็อกผล</span>'
+        : `<span class="official-status progress">ดำเนินการแล้ว ${state.confirmed.length} จาก 7 ทีม</span>`;
+    const confirmedTime = last ? `ยืนยันผลล่าสุด เวลา ${A.formatThaiTime(last.confirmedAt)} น.` : "รอเริ่มการจับฉลาก";
+    return `
+      <section class="slide">
+        <div class="slide-inner official-draw-slide">
+          <header class="official-header">
+            <div>
+              <div class="official-kicker">ผลการจับฉลากอย่างเป็นทางการ</div>
+              <h1>ผลการแบ่งสายการแข่งขันฟุตบอล 7 คน</h1>
+              <p>วันรพี 69 • ${confirmedTime}</p>
+            </div>
+            ${status}
+          </header>
+          <div class="official-grid">
+            ${officialGroupHtml("A", "พบกันหมด • 3 ทีม")}
+            ${officialGroupHtml("B", "Play-off • 4 ทีม")}
+          </div>
+          <footer class="official-footer">ผลการจับฉลากนี้แสดงตามตำแหน่งที่จับได้จากโถจริง</footer>
+        </div>
+      </section>`;
+  }
+
   function buildScoreRows(){
     return A.buildGroupATableRows(state).map(row => `
       <tr>
@@ -269,7 +314,7 @@
 
   function render(){
     const renderer = {
-      intro:introSlide, format:formatSlide, draw:drawSlide, summary:summarySlide, schedule:scheduleSlide
+      intro:introSlide, format:formatSlide, draw:drawSlide, official:officialSlide, summary:summarySlide, schedule:scheduleSlide
     }[forcedStage || state.stage] || introSlide;
     displayMain.innerHTML = renderer();
     clearTimeout(revealTimer);
@@ -286,7 +331,7 @@
   });
   window.addEventListener("keydown", event => {
     if(event.key.toLowerCase() === "f"){ document.documentElement.requestFullscreen?.(); return; }
-    if("12345".includes(event.key) && !forcedStage){
+    if("123456".includes(event.key) && !forcedStage){
       state.stage = A.STAGES[Number(event.key) - 1];
       state = A.saveState(state, "stage");
       render();

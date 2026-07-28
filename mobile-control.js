@@ -8,7 +8,7 @@
   const mobileRoom = String(new URLSearchParams(location.search).get("room") || "").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 64);
   const hasQrSession = Boolean(mobileRoom);
   if(hasQrSession) window.DrawRemote?.configure?.({ room:mobileRoom });
-  const stageNames = { intro: "หน้าต้อนรับ", format: "รูปแบบการแข่งขัน", draw: "กำลังจับฉลาก", summary: "สรุปผล", schedule: "ตารางแข่งขัน" };
+  const stageNames = { intro: "หน้าต้อนรับ", format: "รูปแบบการแข่งขัน", draw: "กำลังจับฉลาก", official: "ผลการจับฉลาก", summary: "สรุป/ผังแข่งขัน", schedule: "ตารางแข่งขัน" };
   const els = {
     syncPill: document.getElementById("mobileSyncPill"),
     stageName: document.getElementById("mobileStageName"), progress: document.getElementById("mobileProgress"),
@@ -132,7 +132,7 @@
     state.currentPosition = "";
     state.currentTeamId = null;
     state.pendingRevealUntil = 0;
-    state.stage = state.confirmed.length === 7 ? "summary" : "draw";
+    state.stage = state.confirmed.length === 7 ? "official" : "draw";
     persist(`มือถือยืนยันผล ${result}`);
   });
 

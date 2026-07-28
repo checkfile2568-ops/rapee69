@@ -5,7 +5,7 @@
 ## 1. สร้าง Apps Script Web App
 
 1. เข้า [Google Apps Script](https://script.google.com/) แล้วสร้าง Project ใหม่
-2. ลบโค้ดเดิมทั้งหมด แล้ววางเนื้อหาจากไฟล์ `GAS_BACKEND.gs` ของเวอร์ชัน 1.6
+2. ลบโค้ดเดิมทั้งหมด แล้ววางเนื้อหาจากไฟล์ `GAS_BACKEND.gs` ของเวอร์ชัน 1.7
 3. กด **Deploy → New deployment → Web app**
 4. ตั้งให้ Script ทำงานภายใต้บัญชีผู้เผยแพร่ และตั้งการเข้าถึงให้มือถือกับคอมเปิด URL ได้
 5. กด Deploy และคัดลอก Web app URL ที่ลงท้ายด้วย `/exec`
@@ -18,7 +18,7 @@
 window.DRAW_REMOTE_SYNC_URL = "https://script.google.com/macros/s/DEPLOYMENT_ID/exec";
 ```
 
-อัปโหลด `sync-config.js` พร้อมไฟล์เวอร์ชัน 1.6 ขึ้น GitHub Pages แล้วกด `Ctrl + F5` บนคอมเพื่อโหลดไฟล์ใหม่
+อัปโหลด `sync-config.js` พร้อมไฟล์เวอร์ชัน 1.7 ขึ้น GitHub Pages แล้วกด `Ctrl + F5` บนคอมเพื่อโหลดไฟล์ใหม่
 
 ## 3. ใช้งานวันจริง
 

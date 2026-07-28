@@ -86,7 +86,7 @@
   }
   function displayLink(){
     const url = new URL("display.html", location.href);
-    url.searchParams.set("v", "1.6.0");
+    url.searchParams.set("v", "1.7.0");
     if(mobileSession) url.searchParams.set("room", mobileSession.room);
     return url.toString();
   }
@@ -193,7 +193,7 @@
     if(usedPositions().has(state.currentPosition) || usedTeams().has(team.id)) return alert("ตำแหน่งหรือทีมนี้ถูกยืนยันไปแล้ว");
     const result = `${state.currentPosition} — ${team.name}`;
     state.confirmed.push({ position:state.currentPosition, teamId:team.id, confirmedAt:new Date().toISOString() });
-    state.currentPosition = ""; state.currentTeamId = null; state.pendingRevealUntil = 0; state.stage = state.confirmed.length === 7 ? "summary" : "draw";
+    state.currentPosition = ""; state.currentTeamId = null; state.pendingRevealUntil = 0; state.stage = state.confirmed.length === 7 ? "official" : "draw";
     persist(`ยืนยันผล ${result}`);
   });
   els.clearCurrentBtn.addEventListener("click", () => { state.currentPosition = ""; state.currentTeamId = null; state.pendingRevealUntil = 0; persist("ล้างผลคู่ปัจจุบัน"); });
@@ -225,8 +225,8 @@
     try { await navigator.clipboard.writeText(lines.join("\n")); alert("คัดลอกข้อความสรุปแล้ว"); } catch { prompt("คัดลอกข้อความด้านล่าง", lines.join("\n")); }
   });
   els.downloadJsonBtn.addEventListener("click", () => { const blob = new Blob([JSON.stringify(state, null, 2)], { type:"application/json" }), url = URL.createObjectURL(blob), a = document.createElement("a"); a.href = url; a.download = `rapee69-draw-backup-${new Date().toISOString().slice(0,19).replaceAll(":","-")}.json`; a.click(); URL.revokeObjectURL(url); });
-  els.printBtn.addEventListener("click", () => { const url = new URL(displayLink()); url.searchParams.set("print", "1"); url.searchParams.set("stage", "summary"); window.open(url, "_blank"); });
-  els.captureBtn.addEventListener("click", () => { const url = new URL(displayLink()); url.searchParams.set("capture", "1"); url.searchParams.set("stage", "summary"); window.open(url, "_blank"); });
+  els.printBtn.addEventListener("click", () => { const url = new URL(displayLink()); url.searchParams.set("print", "1"); url.searchParams.set("stage", "official"); window.open(url, "_blank"); });
+  els.captureBtn.addEventListener("click", () => { const url = new URL(displayLink()); url.searchParams.set("capture", "1"); url.searchParams.set("stage", "official"); window.open(url, "_blank"); });
   els.resetBtn.addEventListener("click", () => { if(prompt("พิมพ์คำว่า RESET เพื่อยืนยันล้างข้อมูลทั้งหมด") !== "RESET") return; state = A.emptyState(); persist("รีเซ็ตระบบทั้งหมด"); });
   if(window.drawChannel) window.drawChannel.addEventListener("message", event => { if(event.data?.type === "display-presence") { lastDisplayPing = Date.now(); render(); } else if(event.data?.state) receive(event.data.state); });
   window.addEventListener("storage", event => { if(event.key === A.STORAGE_KEY) receive(A.loadState()); });
