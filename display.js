@@ -55,22 +55,29 @@
   }
 
   function introSlide(){
+    const now = new Date();
+    const today = new Intl.DateTimeFormat("th-TH", { weekday:"long", day:"numeric", month:"long", year:"numeric" }).format(now);
+    const time = new Intl.DateTimeFormat("th-TH", { hour:"2-digit", minute:"2-digit" }).format(now);
     return `
       <section class="slide">
-        <div class="slide-inner intro-grid">
-          <div class="intro-card">
-            <p class="slide-subtitle">ศาลจังหวัดลพบุรี</p>
-            <h1>จับฉลากแบ่งสาย<br>ฟุตบอล 7 คน<br>วันรพี 69</h1>
-            <div class="intro-details">
-              📅 วันศุกร์ที่ 31 กรกฎาคม 2569<br>
-              🕑 เวลา 14.00 น.<br>
-              🎥 ถ่ายทอดสดผ่าน Google Meet
+        <div class="slide-inner intro-ceremony">
+          <section class="intro-hero">
+            <div class="intro-crest" aria-label="รพี 69"><span>รพี</span><strong>69</strong></div>
+            <div class="intro-eyebrow">ศาลจังหวัดลพบุรี</div>
+            <h1>จับฉลากแบ่งสาย <span>ฟุตบอล 7 คน วันรพี 69</span></h1>
+            <div class="intro-gold-line"></div>
+            <div class="intro-ready">พร้อมเริ่มพิธีจับฉลาก</div>
+            <div class="intro-meta">
+              <span>📅 ${today}</span>
+              <span>🕑 เวลา ${time} น.</span>
+              <span>🎥 ถ่ายทอดสดผ่าน Google Meet</span>
             </div>
-          </div>
-          <div>
-            <h2 style="margin-bottom:14px">ทีมที่เข้าร่วม 7 ทีม</h2>
+          </section>
+          <section class="intro-team-panel">
+            <header><div><span>ผู้เข้าร่วมการแข่งขัน</span><h2>ทีมที่เข้าร่วม</h2></div><b>7 ทีม</b></header>
             <div class="team-number-list">${teamListHtml}</div>
-          </div>
+            <footer>รายชื่อทีมทั้งหมดก่อนเริ่มการจับฉลาก</footer>
+          </section>
         </div>
       </section>`;
   }
