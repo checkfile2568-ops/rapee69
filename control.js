@@ -93,14 +93,17 @@
   function drawQr(link){
     if(!els.mobileQrCanvas || link === qrLinkRendered) return;
     qrLinkRendered = link;
-    const context = els.mobileQrCanvas.getContext("2d");
-    context.clearRect(0, 0, els.mobileQrCanvas.width, els.mobileQrCanvas.height);
+    els.mobileQrCanvas.replaceChildren();
     if(!link) return;
-    if(window.QRCode?.toCanvas){
-      window.QRCode.toCanvas(els.mobileQrCanvas, link, { width:180, margin:1, errorCorrectionLevel:"M", color:{ dark:"#071a3f", light:"#ffffff" } }, () => {});
+    if(typeof window.QRCode === "function"){
+      const options = { text:link, width:180, height:180, colorDark:"#071a3f", colorLight:"#ffffff" };
+      if(window.QRCode.CorrectLevel) options.correctLevel = window.QRCode.CorrectLevel.M;
+      new window.QRCode(els.mobileQrCanvas, options);
     } else {
-      context.fillStyle = "#071a3f"; context.font = "bold 13px sans-serif"; context.textAlign = "center";
-      context.fillText("กำลังโหลด QR", 90, 90);
+      const error = document.createElement("span");
+      error.className = "qr-load-error";
+      error.textContent = "โหลด QR ไม่สำเร็จ";
+      els.mobileQrCanvas.append(error);
     }
   }
   function mobileAge(){ return lastMobilePing ? Math.max(0, Math.round((Date.now() - lastMobilePing) / 1000)) : null; }

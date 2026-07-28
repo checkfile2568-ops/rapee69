@@ -74,7 +74,7 @@
             <p id="mobileSessionNote" class="session-note">ตั้งค่า Apps Script ใน <code>sync-config.js</code> ก่อนใช้งานข้ามเครือข่าย</p>
           </div>
           <div class="mobile-qr-wrap">
-            <canvas id="mobileQrCanvas" width="180" height="180" aria-label="QR สำหรับเปิดหน้าควบคุมมือถือ"></canvas>
+            <div id="mobileQrCanvas" class="mobile-qr-canvas" role="img" aria-label="QR สำหรับเปิดหน้าควบคุมมือถือ"></div>
             <div class="mobile-qr-caption">สแกนครั้งเดียว แล้วใช้ลิงก์เดิมตลอดรอบ</div>
           </div>
         </div>
@@ -200,7 +200,7 @@
   <script src="sync-config.js?v=1.7.1"></script>
   <script src="firebase-config.js?v=1.7.0"></script>
   <script src="remote-sync.js?v=1.7.0"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script src="app.js?v=1.7.0"></script>
   <script type="module" src="firebase-sync.js?v=1.7.0"></script>
   <script src="control.js?v=1.7.0"></script>

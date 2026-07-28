@@ -797,6 +797,8 @@ h1,h2,h3,.display-title,.group-head,.format-big,.big-position,.big-team,
 .session-note{margin:0;padding:11px 12px;border-radius:12px;border-left:4px solid var(--premium-gold);background:#fff9e8;color:#624d15;font-weight:700;line-height:1.45}
 .session-note code{padding:1px 4px;border-radius:4px;background:rgba(255,255,255,.7);font-family:Consolas,monospace;font-size:.9em}
 .mobile-qr-wrap{display:grid;justify-items:center;gap:7px;padding:10px;border:1px solid rgba(13,50,111,.14);border-radius:16px;background:linear-gradient(145deg,#f8fbff,#fffaf0)}
-.mobile-qr-wrap canvas{display:block;width:180px;height:180px;border-radius:8px;background:#fff;image-rendering:pixelated}
+.mobile-qr-canvas{display:grid;place-items:center;width:180px;height:180px;overflow:hidden;border-radius:8px;background:#fff}
+.mobile-qr-canvas canvas,.mobile-qr-canvas img{display:block;width:180px!important;height:180px!important;image-rendering:pixelated}
+.qr-load-error{padding:14px;color:var(--red);font-size:13px;font-weight:700;line-height:1.35;text-align:center}
 .mobile-qr-caption{max-width:190px;color:var(--muted);font-size:12px;font-weight:700;line-height:1.3;text-align:center}
 @media (max-width:720px){.mobile-session-grid{grid-template-columns:1fr}.mobile-qr-wrap{justify-self:center}.session-row{grid-template-columns:1fr}.mobile-session-actions .btn{flex:1 1 190px}}
