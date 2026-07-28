@@ -9,6 +9,8 @@
   const hasQrSession = Boolean(mobileRoom);
   if(hasQrSession) window.DrawRemote?.configure?.({ room:mobileRoom });
   const stageNames = { intro: "หน้าต้อนรับ", format: "รูปแบบการแข่งขัน", draw: "กำลังจับฉลาก", official: "ผลการจับฉลาก", summary: "สรุป/ผังแข่งขัน", schedule: "ตารางแข่งขัน" };
+  const firebaseOnlineLabel = "Firebase Realtime API SDK Online";
+  const animatedOnlineLabel = () => [...firebaseOnlineLabel].map((char, index) => `<span style="--letter:${index}">${char === " " ? "&nbsp;" : char}</span>`).join("");
   const els = {
     syncPill: document.getElementById("mobileSyncPill"),
     stageName: document.getElementById("mobileStageName"), progress: document.getElementById("mobileProgress"),
@@ -45,15 +47,15 @@
     if (!canControl() || !team || state.locked || (usedTeams().has(teamId) && Number(state.currentTeamId) !== teamId)) return;
     state.currentTeamId = teamId;
     state.stage = "draw";
-    state.pendingRevealUntil = Date.now() + 2500;
-    persist(`มือถือเปิดฉลากทีมหมายเลข ${teamId}`);
+    state.pendingRevealUntil = 0;
+    persist(`มือถือเลือกทีมหมายเลข ${teamId}`);
   }
 
   function renderSync() {
     const firebaseConfigured = Boolean(window.DrawFirebase?.enabled || firebaseStatus.enabled);
     if (firebaseConfigured) {
-      els.syncPill.className = `mobile-sync ${firebaseStatus.online ? "online" : "offline"}`;
-      els.syncPill.textContent = firebaseStatus.online ? "● Firebase Realtime API SDK ออนไลน์" : "● Firebase Realtime API SDK กำลังเชื่อมต่อ";
+      els.syncPill.className = `mobile-sync ${firebaseStatus.online ? "online typing-online" : "offline"}`;
+      els.syncPill.innerHTML = firebaseStatus.online ? animatedOnlineLabel() : "● Firebase Realtime API SDK กำลังเชื่อมต่อ";
       els.hint.textContent = firebaseStatus.online ? "คำสั่งจากหน้านี้จะส่งไปยังคอมและจอนำเสนอทันที" : "ตรวจสอบอินเทอร์เน็ตและค่า Firebase หากสถานะไม่เปลี่ยนเป็นสีเขียว";
       return;
     }

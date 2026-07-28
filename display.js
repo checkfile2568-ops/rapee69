@@ -5,17 +5,23 @@
   const displayMain = document.getElementById("displayMain");
   const liveDate = document.getElementById("liveDate");
   const liveClock = document.getElementById("liveClock");
+  const liveUpdated = document.getElementById("liveUpdated");
   const displayFirebaseStatus = document.getElementById("displayFirebaseStatus");
   let firebaseStatus = { enabled: Boolean(window.DrawFirebase?.enabled), online: false, error: "" };
   const params = new URLSearchParams(location.search);
   const forcedStage = A.STAGES.includes(params.get("stage")) ? params.get("stage") : "";
   let revealTimer;
+  const firebaseOnlineLabel = "Firebase Realtime API SDK Online";
+
+  function animatedOnlineLabel(){
+    return [...firebaseOnlineLabel].map((char, index) => `<span style="--letter:${index}">${char === " " ? "&nbsp;" : char}</span>`).join("");
+  }
 
   function renderFirebaseStatus(){
     if(!displayFirebaseStatus) return;
     const configured = Boolean(window.DrawFirebase?.enabled || firebaseStatus.enabled);
-    displayFirebaseStatus.className = `firebase-status ${firebaseStatus.online ? "online" : configured ? "checking" : "offline"}`;
-    displayFirebaseStatus.textContent = firebaseStatus.online ? "● Firebase Realtime API SDK ออนไลน์" : configured ? "● Firebase Realtime API SDK กำลังเชื่อมต่อ" : "● Firebase Realtime API SDK ไม่ได้ตั้งค่า";
+    displayFirebaseStatus.className = `firebase-status display-firebase-status ${firebaseStatus.online ? "online typing-online" : configured ? "checking" : "offline"}`;
+    displayFirebaseStatus.innerHTML = firebaseStatus.online ? animatedOnlineLabel() : configured ? "● Firebase Realtime API SDK กำลังเชื่อมต่อ" : "● Firebase Realtime API SDK ไม่ได้ตั้งค่า";
     displayFirebaseStatus.title = firebaseStatus.error || "";
   }
 
@@ -205,6 +211,26 @@
   }
 
   function summarySlide(){
+    const complete = state.confirmed.length === A.POSITIONS.length;
+    return `
+      <section class="slide">
+        <div class="slide-inner group-summary-slide">
+          <header class="official-header">
+            <div>
+              <div class="official-kicker">ผลการจับฉลากอย่างเป็นทางการ</div>
+              <h1>ทีมในแต่ละสายการแข่งขัน</h1>
+              <p>${complete ? "จับฉลากครบ 7 ทีมแล้ว" : `ดำเนินการแล้ว ${state.confirmed.length} จาก 7 ทีม`}</p>
+            </div>
+            <span class="official-status ${complete ? "review" : "progress"}">${complete ? "พร้อมตรวจสอบผล" : "กำลังจับฉลาก"}</span>
+          </header>
+          <div class="official-grid group-summary-grid">
+            ${officialGroupHtml("A", "พบกันหมด • 3 ทีม")}
+            ${officialGroupHtml("B", "Play-off • 4 ทีม")}
+          </div>
+          <footer class="official-footer">หน้าถัดไปจะแสดงตารางและรูปแบบการแข่งขันฉบับเต็ม</footer>
+        </div>
+      </section>`;
+
     const n = pos => A.getResolvedName(state, pos);
 
     return `
@@ -307,7 +333,8 @@
     return `
       <section class="slide">
         <div class="slide-inner">
-          <h1 style="font-size:clamp(28px,4vw,54px); margin-bottom:14px">ตารางการแข่งขันฟุตบอล 7 คน</h1>
+          <h1 style="font-size:clamp(28px,4vw,54px); margin-bottom:6px">ตารางแข่งขัน สาย A และ สาย B</h1>
+          <p class="slide-subtitle" style="margin:0 0 12px">โปรแกรมการแข่งขันและรูปแบบ Play-off ฉบับเต็ม</p>
           <table class="schedule-table">
             <thead>
               <tr><th>ลำดับ</th><th>เวลา</th><th>สาย/รอบ</th><th>รายการ</th><th>คู่แข่งขัน</th></tr>
@@ -364,6 +391,7 @@
       const time = new Intl.DateTimeFormat("th-TH", { hour:"2-digit", minute:"2-digit", second:"2-digit" }).format(now);
       liveClock.textContent = `เวลา ${time} น.`;
     }
+    if(liveUpdated) liveUpdated.textContent = `อัปเดตล่าสุด ${A.formatThaiTime(state.updatedAt)} น.`;
   }
   async function captureSummary(){
     if(!window.html2canvas){ alert("ยังโหลดเครื่องมือบันทึกภาพไม่สำเร็จ โปรดตรวจการเชื่อมต่ออินเทอร์เน็ตแล้วลองอีกครั้ง"); return; }

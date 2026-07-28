@@ -38,6 +38,8 @@
   const usedPositions = () => new Set(state.confirmed.map(item => item.position));
   const usedTeams = () => new Set(state.confirmed.map(item => Number(item.teamId)));
   const cloudSyncEnabled = () => Boolean(window.DrawFirebase?.enabled || window.DrawRemote?.enabled);
+  const firebaseOnlineLabel = "Firebase Realtime API SDK Online";
+  const animatedOnlineLabel = () => [...firebaseOnlineLabel].map((char, index) => `<span style="--letter:${index}">${char === " " ? "&nbsp;" : char}</span>`).join("");
   function updateControlClock(){
     if(!controlClock) return;
     const now = new Date();
@@ -111,8 +113,8 @@
   function renderFirebaseStatus(){
     if(!els.firebaseStatus) return;
     const configured = Boolean(window.DrawFirebase?.enabled || firebaseStatus.enabled);
-    els.firebaseStatus.className = `firebase-status ${firebaseStatus.online ? "online" : configured ? "checking" : "offline"}`;
-    els.firebaseStatus.textContent = firebaseStatus.online ? "● Firebase Realtime API SDK ออนไลน์" : configured ? "● Firebase Realtime API SDK กำลังเชื่อมต่อ" : "● Firebase Realtime API SDK ไม่ได้ตั้งค่า";
+    els.firebaseStatus.className = `firebase-status ${firebaseStatus.online ? "online typing-online" : configured ? "checking" : "offline"}`;
+    els.firebaseStatus.innerHTML = firebaseStatus.online ? animatedOnlineLabel() : configured ? "● Firebase Realtime API SDK กำลังเชื่อมต่อ" : "● Firebase Realtime API SDK ไม่ได้ตั้งค่า";
     els.firebaseStatus.title = firebaseStatus.error || "";
   }
   function mobileAge(){ return lastMobilePing ? Math.max(0, Math.round((Date.now() - lastMobilePing) / 1000)) : null; }
@@ -197,7 +199,7 @@
     const id = Number(els.teamSelect.value), team = A.getTeam(id);
     if(!team) return;
     if(usedTeams().has(id) && id !== Number(state.currentTeamId)) return alert("ทีมนี้ถูกใช้แล้ว");
-    state.currentTeamId = id; state.stage = "draw"; state.pendingRevealUntil = Date.now() + 2500; persist(`เปิดฉลากทีมหมายเลข ${id}`);
+    state.currentTeamId = id; state.stage = "draw"; state.pendingRevealUntil = 0; persist(`เลือกทีมหมายเลข ${id}`);
   });
   els.confirmBtn.addEventListener("click", () => {
     const team = A.getTeam(state.currentTeamId);
@@ -230,7 +232,7 @@
     if(state.mode !== "rehearsal") return;
     const positions = A.POSITIONS.filter(p => !usedPositions().has(p)), teams = A.TEAMS.filter(t => !usedTeams().has(t.id));
     if(!positions.length || !teams.length) return alert("ผลครบแล้ว");
-    state.currentPosition = positions[Math.floor(Math.random() * positions.length)]; state.currentTeamId = teams[Math.floor(Math.random() * teams.length)].id; state.pendingRevealUntil = Date.now() + 2500; state.stage = "draw"; persist("สุ่มผลสำหรับการซ้อม");
+    state.currentPosition = positions[Math.floor(Math.random() * positions.length)]; state.currentTeamId = teams[Math.floor(Math.random() * teams.length)].id; state.pendingRevealUntil = 0; state.stage = "draw"; persist("สุ่มผลสำหรับการซ้อม");
   });
   els.copySummaryBtn.addEventListener("click", async () => {
     const map = A.getPairMap(state), lines = ["ผลการจับฉลากแบ่งสายการแข่งขันฟุตบอล 7 คน วันรพี 69", "วันที่ 31 กรกฎาคม 2569", "", "สาย A", ...["A1","A2","A3"].map(p => `${p} — ${map[p]?.name || "รอผล"}`), "", "สาย B", ...["B1","B2","B3","B4"].map(p => `${p} — ${map[p]?.name || "รอผล"}`)];
