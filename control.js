@@ -1,5 +1,7 @@
 (() => {
   "use strict";
+
+  window.DRAW_FIREBASE_ROLE = "control";
   const A = window.DrawApp;
   let state = A.loadState();
   let lastDisplayPing = 0;
@@ -125,7 +127,7 @@
   }
   function displayLink(){
     const url = new URL("display.html", location.href);
-    url.searchParams.set("v", "1.9.7");
+    url.searchParams.set("v", "1.9.8");
     if(mobileSession) url.searchParams.set("room", mobileSession.room);
     return url.toString();
   }
@@ -153,7 +155,7 @@
     els.firebaseStatus.title = firebaseStatus.error || "";
   }
   function mobileAge(){
-    const firebaseHeartbeat = Date.parse(state.mobileHeartbeatAt || "");
+    const firebaseHeartbeat = window.DrawFirebase?.enabled ? 0 : Date.parse(state.mobileHeartbeatAt || "");
     const lastSeen = Math.max(lastMobilePing, Number.isFinite(firebaseHeartbeat) ? firebaseHeartbeat : 0);
     return lastSeen ? Math.max(0, Math.round((Date.now() - lastSeen) / 1000)) : null;
   }

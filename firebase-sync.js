@@ -1,5 +1,5 @@
 import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, goOnline, onDisconnect, onValue, ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, goOnline, onDisconnect, onValue, ref, runTransaction, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 (() => {
   "use strict";
@@ -25,7 +25,12 @@ import { getDatabase, goOnline, onDisconnect, onValue, ref, set } from "https://
     const nextState = pendingWrite;
     pendingWrite = null;
     writeInFlight = true;
-    set(stateRef, nextState)
+    runTransaction(stateRef, currentState => {
+      const currentAt = Date.parse(currentState?.updatedAt || "");
+      const nextAt = Date.parse(nextState?.updatedAt || "");
+      if (Number.isFinite(currentAt) && Number.isFinite(nextAt) && currentAt > nextAt) return;
+      return nextState;
+    }, { applyLocally:false })
       .then(() => { lastError = ""; emitStatus(); })
       .catch(error => { pendingWrite = nextState; fail(error); })
       .finally(() => {
@@ -71,6 +76,7 @@ import { getDatabase, goOnline, onDisconnect, onValue, ref, set } from "https://
     stateRef = ref(database, path);
     presenceRef = ref(database, `${path}-presence/${clientId}`);
     onDisconnect(presenceRef).remove().catch(() => {});
+    if (window.DRAW_FIREBASE_ROLE) startPresence(window.DRAW_FIREBASE_ROLE);
 
     onValue(ref(database, ".info/connected"), snapshot => {
       connected = snapshot.val() === true;

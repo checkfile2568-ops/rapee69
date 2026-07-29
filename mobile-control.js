@@ -1,6 +1,8 @@
 (() => {
   "use strict";
 
+  window.DRAW_FIREBASE_ROLE = "mobile";
+
   const A = window.DrawApp;
   let state = A.loadState();
   let firebaseStatus = { enabled: false, online: false, error: "" };
@@ -135,7 +137,6 @@
     const team = A.getTeam(state.currentTeamId);
     if (!canControl() || !state.currentPosition || !team || state.locked) return;
     if (usedPositions().has(state.currentPosition) || usedTeams().has(team.id)) return alert("ตำแหน่งหรือทีมนี้ถูกใช้แล้ว");
-    if (!confirm(`ยืนยันผล\n${state.currentPosition} — ${team.name}`)) return;
     state.confirmed.push({ position: state.currentPosition, teamId: team.id, confirmedAt: new Date().toISOString() });
     const result = `${state.currentPosition} — ${team.name}`;
     state.currentPosition = "";

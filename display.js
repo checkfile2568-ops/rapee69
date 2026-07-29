@@ -1,5 +1,6 @@
 (() => {
   "use strict";
+  window.DRAW_FIREBASE_ROLE = "display";
   const A = window.DrawApp;
   let state = A.loadState();
   const displayMain = document.getElementById("displayMain");
