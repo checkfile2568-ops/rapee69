@@ -39,7 +39,7 @@
     undoBtn:document.getElementById("undoBtn"), lockBtn:document.getElementById("lockBtn"), modeBtn:document.getElementById("modeBtn"), rehearsalRandomBtn:document.getElementById("rehearsalRandomBtn"),
     currentRound:document.getElementById("currentRound"), currentPosition:document.getElementById("currentPosition"), currentTeam:document.getElementById("currentTeam"), currentStatus:document.getElementById("currentStatus"), groupASlots:document.getElementById("groupASlots"),
     groupBSlots:document.getElementById("groupBSlots"), historyList:document.getElementById("historyList"), scheduleBody:document.getElementById("scheduleBody"), progressPill:document.getElementById("progressPill"),
-    modePill:document.getElementById("modePill"), connectionPill:document.getElementById("connectionPill"), readinessList:document.getElementById("readinessList"), stateTime:document.getElementById("stateTime"), firebaseStatus:document.getElementById("controlFirebaseStatus"),
+    modePill:document.getElementById("modePill"), connectionPill:document.getElementById("connectionPill"), readinessList:document.getElementById("readinessList"), stateTime:document.getElementById("stateTime"), firebaseStatus:document.getElementById("controlFirebaseStatus"), liveStageName:document.getElementById("liveStageName"),
     lockedAlert:document.getElementById("lockedAlert"), copySummaryBtn:document.getElementById("copySummaryBtn"), downloadJsonBtn:document.getElementById("downloadJsonBtn"), printBtn:document.getElementById("printBtn"),
     captureBtn:document.getElementById("captureBtn"), captureStageSelect:document.getElementById("captureStageSelect"), resetBtn:document.getElementById("resetBtn"),
     recordStartBtn:document.getElementById("recordStartBtn"), recordStopBtn:document.getElementById("recordStopBtn"), recordStartPanelBtn:document.getElementById("recordStartPanelBtn"), recordStopPanelBtn:document.getElementById("recordStopPanelBtn"), recordingPill:document.getElementById("recordingPill"), recordingStatus:document.getElementById("recordingStatus"),
@@ -105,7 +105,7 @@
   }
   function displayLink(){
     const url = new URL("display.html", location.href);
-    url.searchParams.set("v", "1.7.11");
+    url.searchParams.set("v", "1.8.1");
     if(mobileSession) url.searchParams.set("room", mobileSession.room);
     return url.toString();
   }
@@ -270,6 +270,8 @@
     renderHistory();
     els.scheduleBody.innerHTML = A.buildScheduleRows(state).map(row => `<tr>${row.map(cell => `<td>${A.escapeHtml(cell)}</td>`).join("")}</tr>`).join("");
     document.querySelectorAll("[data-stage]").forEach(button => button.classList.toggle("active", button.dataset.stage === state.stage));
+    const stageNames = { intro:"หน้าต้อนรับ", format:"รูปแบบการแข่งขัน", draw:"จับฉลาก", official:"ผลการจับฉลาก", summary:"สรุป / ผังแข่งขัน", schedule:"ตารางแข่งขัน" };
+    if(els.liveStageName) els.liveStageName.textContent = stageNames[state.stage] || stageNames.intro;
     const live = state.mode === "live";
     els.modePill.textContent = live ? "โหมดถ่ายทอดสด" : "โหมดซ้อม"; els.modePill.className = `pill ${live ? "live" : ""}`; els.rehearsalRandomBtn.hidden = live;
     [els.positionSelect, els.teamSelect, els.confirmBtn, els.clearCurrentBtn, els.undoBtn, els.rehearsalRandomBtn].forEach(el => { el.disabled = state.locked; });

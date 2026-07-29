@@ -7,15 +7,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=1.7.11" />
+  <link rel="stylesheet" href="styles.css?v=1.8.1" />
 </head>
 <body>
   <header class="app-header">
     <div class="brand-lockup">
       <div class="mini-crest"><span>รพี</span><strong>69</strong></div>
       <div class="brand-copy">
-        <div class="app-kicker">ศาลจังหวัดลพบุรี <span class="version-chip">v1.7</span></div>
-        <h1>Firebase Realtime Controller</h1>
+        <div class="app-kicker">ศาลจังหวัดลพบุรี <span class="version-chip">v1.8</span></div>
+        <h1>หน้าควบคุมการจับฉลากฟุตบอล 7 คน</h1>
         <div id="controlClock" class="header-meta">วันที่ -- · เวลา --:--:-- น.</div>
         <div id="controlFirebaseStatus" class="firebase-status checking">● Firebase Realtime API SDK กำลังเชื่อมต่อ</div>
       </div>
@@ -30,71 +30,103 @@
   </header>
 
   <main class="control-shell">
-    <section class="panel" style="margin-bottom:20px">
+    <section class="panel control-setup-panel" aria-labelledby="setupHeading">
       <div class="panel-title">
-        <h2>หน้าที่กำลังออกอากาศ</h2>
+        <div>
+          <span class="setup-eyebrow">ตั้งค่าก่อนเริ่ม</span>
+          <h2 id="setupHeading">ตรวจความพร้อมและเชื่อมต่ออุปกรณ์</h2>
+          <p>ตรวจสถานะระบบก่อนเริ่มการถ่ายทอดสด แล้วสร้าง QR สำหรับมือถือเพียงครั้งเดียว</p>
+        </div>
         <div class="mode-row">
           <span id="connectionPill" class="pill ok">● เชื่อมต่อในเครื่อง</span>
           <span id="modePill" class="pill live">โหมดถ่ายทอดสด</span>
         </div>
       </div>
       <div class="panel-body">
-        <div class="stage-buttons">
-          <button class="btn stage" data-stage="intro">1. หน้าต้อนรับ</button>
-          <button class="btn stage" data-stage="format">2. รูปแบบแข่งขัน</button>
-          <button class="btn stage" data-stage="draw">3. จับฉลาก</button>
-          <button class="btn stage" data-stage="official">4. ผลการจับฉลาก</button>
-          <button class="btn stage" data-stage="summary">5. สรุป/ผังแข่งขัน</button>
-          <button class="btn stage" data-stage="schedule">6. ตารางแข่งขัน</button>
+        <div class="control-setup-grid">
+          <section class="setup-card setup-readiness" aria-labelledby="readinessHeading">
+            <div class="setup-card-head">
+              <div>
+                <span class="setup-card-number">01</span>
+                <h3 id="readinessHeading">ตรวจความพร้อมก่อนเริ่ม</h3>
+              </div>
+              <span class="setup-status-note">ตรวจอัตโนมัติ</span>
+            </div>
+            <ul id="readinessList" class="readiness-list"></ul>
+          </section>
+
+          <section class="setup-card setup-mobile" aria-labelledby="mobileSetupHeading">
+            <div class="setup-card-head">
+              <div>
+                <span class="setup-card-number">02</span>
+                <h3 id="mobileSetupHeading">เชื่อมต่อควบคุมด้วยมือถือ</h3>
+                <div class="mobile-session-subtitle">สร้าง QR เพียงครั้งเดียวสำหรับรอบนี้ — จอดับแล้วเปิดแท็บเดิมหรือสแกน QR เดิมได้</div>
+              </div>
+              <span id="mobileSessionPill" class="pill offline">กำลังเตรียม QR</span>
+            </div>
+            <div class="mobile-session-body">
+              <div class="mobile-session-actions">
+                <button class="btn primary" id="startMobileSessionBtn">เริ่ม / แสดง QR ควบคุมมือถือ</button>
+                <button class="btn" id="renewMobileSessionBtn">สร้าง QR รอบใหม่</button>
+                <button class="btn" id="copyMobileLinkBtn">คัดลอกลิงก์มือถือ</button>
+              </div>
+              <div class="mobile-session-grid">
+                <div class="mobile-session-info">
+                  <div class="session-row"><span>รหัสรอบควบคุม</span><strong id="mobileSessionCode">—</strong></div>
+                  <div class="session-row"><span>สถานะมือถือ</span><strong id="mobileSessionStatus">ยังไม่ได้เริ่มรอบ</strong></div>
+                  <p id="mobileSessionNote" class="session-note">ตั้งค่า Apps Script ใน <code>sync-config.js</code> ก่อนใช้งานข้ามเครือข่าย</p>
+                </div>
+                <div class="mobile-qr-wrap">
+                  <div id="mobileQrCanvas" class="mobile-qr-canvas" role="img" aria-label="QR สำหรับเปิดหน้าควบคุมมือถือ"></div>
+                  <div class="mobile-qr-caption">สแกนครั้งเดียว แล้วใช้ลิงก์เดิมตลอดรอบ</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="setup-card setup-recording" aria-labelledby="recordingHeading">
+            <div class="setup-card-head">
+              <div>
+                <span class="setup-card-number">03</span>
+                <h3 id="recordingHeading">บันทึกวิดีโอจอนำเสนอ</h3>
+                <div class="recording-subtitle">เลือกหน้าต่าง “หน้าจอนำเสนอ” ในกล่อง Chrome และเลือกแชร์เสียงระบบเมื่อมี</div>
+              </div>
+              <span id="recordingPill" class="pill">ยังไม่ได้บันทึก</span>
+            </div>
+            <div class="recording-body">
+              <div class="recording-actions">
+                <button class="btn red" id="recordStartPanelBtn">● เริ่มบันทึกวิดีโอ</button>
+                <button class="btn" id="recordStopPanelBtn" hidden>■ หยุดและบันทึกไฟล์</button>
+              </div>
+              <p id="recordingStatus" class="recording-status">ไฟล์จะบันทึกเป็น WebM ลงในเครื่องนี้เมื่อกดหยุดบันทึก</p>
+            </div>
+          </section>
         </div>
-        <div class="keyboard-hint">คีย์ลัดหน้าจอนำเสนอ: <strong>1–6</strong> เปลี่ยนหน้า · <strong>F</strong> เต็มจอ</div>
       </div>
     </section>
 
-    <section class="panel recording-panel" style="margin-bottom:20px">
-      <div class="panel-title">
-        <div><h2>บันทึกวิดีโอจอนำเสนอ</h2><div class="recording-subtitle">เลือกหน้าต่าง “หน้าจอนำเสนอ” ในกล่อง Chrome และเลือกแชร์เสียงระบบเมื่อมี</div></div>
-        <span id="recordingPill" class="pill">ยังไม่ได้บันทึก</span>
-      </div>
-      <div class="panel-body recording-body">
-        <div class="recording-actions">
-          <button class="btn red" id="recordStartPanelBtn">● เริ่มบันทึกวิดีโอ</button>
-          <button class="btn" id="recordStopPanelBtn" hidden>■ หยุดและบันทึกไฟล์</button>
-        </div>
-        <p id="recordingStatus" class="recording-status">ไฟล์จะบันทึกเป็น WebM ลงในเครื่องนี้เมื่อกดหยุดบันทึก</p>
-      </div>
-    </section>
-
-    <section class="panel readiness-panel" style="margin-bottom:20px">
-      <div class="panel-title"><h2>ตรวจความพร้อมก่อนเริ่ม</h2></div>
-      <div class="panel-body"><ul id="readinessList" class="readiness-list"></ul></div>
-    </section>
-
-    <section class="panel mobile-session-panel" style="margin-bottom:20px">
+    <section class="panel broadcast-panel" aria-labelledby="broadcastHeading">
       <div class="panel-title">
         <div>
-          <h2>เชื่อมต่อควบคุมด้วยมือถือ</h2>
-          <div class="mobile-session-subtitle">สร้าง QR เพียงครั้งเดียวสำหรับรอบนี้ — จอดับแล้วสแกน QR เดิมหรือเปิดแท็บเดิมได้</div>
+          <span class="setup-eyebrow">ควบคุมการออกอากาศ</span>
+          <h2 id="broadcastHeading">หน้าจอที่กำลังออกอากาศ</h2>
+          <p>กดหมายเลขเพื่อให้หน้าจอนำเสนอแสดงหน้านั้นทันที</p>
         </div>
-        <span id="mobileSessionPill" class="pill offline">กำลังเตรียม QR</span>
+        <div class="broadcast-current" aria-live="polite">
+          <span>กำลังออกอากาศ</span>
+          <strong id="liveStageName">หน้าต้อนรับ</strong>
+        </div>
       </div>
-      <div class="panel-body mobile-session-body">
-        <div class="mobile-session-actions">
-          <button class="btn primary" id="startMobileSessionBtn">เริ่ม / แสดง QR ควบคุมมือถือ</button>
-          <button class="btn" id="renewMobileSessionBtn">สร้าง QR รอบใหม่</button>
-          <button class="btn" id="copyMobileLinkBtn">คัดลอกลิงก์มือถือ</button>
+      <div class="panel-body">
+        <div class="stage-buttons" aria-label="เลือกหน้าจอนำเสนอ">
+          <button class="btn stage" data-stage="intro"><b>1</b><span>หน้าต้อนรับ</span></button>
+          <button class="btn stage" data-stage="format"><b>2</b><span>รูปแบบการแข่งขัน</span></button>
+          <button class="btn stage" data-stage="draw"><b>3</b><span>จับฉลาก</span></button>
+          <button class="btn stage" data-stage="official"><b>4</b><span>ผลการจับฉลาก</span></button>
+          <button class="btn stage" data-stage="summary"><b>5</b><span>สรุป / ผังแข่งขัน</span></button>
+          <button class="btn stage" data-stage="schedule"><b>6</b><span>ตารางแข่งขัน</span></button>
         </div>
-        <div class="mobile-session-grid">
-          <div class="mobile-session-info">
-            <div class="session-row"><span>รหัสรอบควบคุม</span><strong id="mobileSessionCode">—</strong></div>
-            <div class="session-row"><span>สถานะมือถือ</span><strong id="mobileSessionStatus">ยังไม่ได้เริ่มรอบ</strong></div>
-            <p id="mobileSessionNote" class="session-note">ตั้งค่า Apps Script ใน <code>sync-config.js</code> ก่อนใช้งานข้ามเครือข่าย</p>
-          </div>
-          <div class="mobile-qr-wrap">
-            <div id="mobileQrCanvas" class="mobile-qr-canvas" role="img" aria-label="QR สำหรับเปิดหน้าควบคุมมือถือ"></div>
-            <div class="mobile-qr-caption">สแกนครั้งเดียว แล้วใช้ลิงก์เดิมตลอดรอบ</div>
-          </div>
-        </div>
+        <div class="keyboard-hint">คีย์ลัดหน้าจอนำเสนอ: <strong>1–6</strong> เปลี่ยนหน้า · <strong>F</strong> เต็มจอ</div>
       </div>
     </section>
 
@@ -213,7 +245,7 @@
               <button class="btn red" id="resetBtn">รีเซ็ตทั้งหมด</button>
             </div>
             <div class="alert warning">
-              เวอร์ชัน 1.7: เลือกภาพผลการจับฉลาก หรือผลตารางแข่งขันก่อนบันทึก PNG
+              เวอร์ชัน 1.8: เลือกผลการจับฉลากหรือตารางแข่งขันก่อนบันทึก PNG; การพิมพ์ใช้หน้าผลการจับฉลากอย่างเป็นทางการ
             </div>
           </div>
         </section>
@@ -221,12 +253,12 @@
     </div>
   </main>
 
-  <script src="sync-config.js?v=1.7.1"></script>
-  <script src="firebase-config.js?v=1.7.2"></script>
-  <script src="remote-sync.js?v=1.7.0"></script>
+  <script src="sync-config.js?v=1.8.1"></script>
+  <script src="firebase-config.js?v=1.8.1"></script>
+  <script src="remote-sync.js?v=1.8.1"></script>
   <script src="vendor/qrcode.min.js?v=1.0.0"></script>
-  <script src="app.js?v=1.7.11"></script>
-  <script type="module" src="firebase-sync.js?v=1.7.0"></script>
-  <script src="control.js?v=1.7.11"></script>
+  <script src="app.js?v=1.8.1"></script>
+  <script type="module" src="firebase-sync.js?v=1.8.1"></script>
+  <script src="control.js?v=1.8.1"></script>
 </body>
 </html>
