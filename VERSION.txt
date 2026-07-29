@@ -1,1 +1,1 @@
-Rapee69 Draw System v1.8 — Pre-start setup panel, broadcast selector, and responsive controls
+Rapee69 Draw System v1.9 — Direct local recording, automatic 10-minute segments, and shared output folder

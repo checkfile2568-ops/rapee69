@@ -1,9 +1,9 @@
 (() => {
   "use strict";
 
-  const VERSION = "1.8";
+  const VERSION = "1.9";
   // Keep the v1.4 key/channel so an existing control computer retains its saved draw.
-  // v1.8 keeps the one-session QR bridge, official draw summary, and a light mobile heartbeat.
+  // v1.9 keeps the one-session QR bridge and adds local recording/output-folder support.
   const STORAGE_KEY = "rapee69_draw_state_v14";
   const CHANNEL_NAME = "rapee69_draw_channel_v14";
   const STAGES = ["intro", "format", "draw", "official", "summary", "schedule"];

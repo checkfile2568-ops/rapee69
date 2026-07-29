@@ -800,7 +800,7 @@ h1,h2,h3,.display-title,.group-head,.format-big,.big-position,.big-team,
   .official-draw-slide{overflow:auto}.official-grid{grid-template-columns:1fr}.official-header{align-items:flex-start}
   .group-summary-slide{overflow:auto}.display-firebase-status{position:static;transform:none;order:3;margin:0 auto}.display-topbar{flex-wrap:wrap}.display-meta{margin-left:auto}
 }
-@media (max-width:650px){.readiness-list,.remaining-draw{grid-template-columns:1fr}.recording-body{align-items:flex-start;flex-direction:column}.recording-status{font-size:14px}}
+@media (max-width:650px){.readiness-list,.remaining-draw{grid-template-columns:1fr}.recording-body{align-items:flex-start;flex-direction:column}.setup-recording .recording-body{grid-template-columns:1fr}.recording-status{font-size:14px}}
 
 /* =========================================================
    v1.6 — compact phone remote. It is intentionally independent from
@@ -902,7 +902,14 @@ h1,h2,h3,.display-title,.group-head,.format-big,.big-position,.big-team,
 .setup-mobile .mobile-qr-wrap .mobile-qr-canvas canvas,.setup-mobile .mobile-qr-wrap .mobile-qr-canvas img{width:142px!important;height:142px!important}
 .setup-mobile .mobile-qr-caption{max-width:150px;font-size:11px}
 .setup-recording{grid-column:1 / -1;background:radial-gradient(circle at 95% 20%,rgba(255,210,205,.55),transparent 14rem),linear-gradient(145deg,#fff,#f8fbff)}
-.setup-recording .recording-body{min-height:42px}.setup-recording .recording-status{max-width:760px;font-size:13px}
+.setup-recording .recording-body{min-height:42px;display:grid;grid-template-columns:auto minmax(230px,300px) minmax(170px,1fr);align-items:center}.setup-recording .recording-status{max-width:640px;font-size:13px}
+.recording-quality{display:grid;gap:4px;min-width:0;color:var(--premium-navy);font-size:12px;font-weight:900;line-height:1.2}
+.recording-quality select{width:100%;min-height:39px;padding:7px 30px 7px 10px;border:1px solid rgba(13,50,111,.24);border-radius:10px;background:#fff;color:var(--ink);font:inherit;font-size:13px;font-weight:800}
+.recording-quality select:disabled{opacity:.62;cursor:not-allowed}
+.recording-destination{display:grid;gap:2px;min-width:0;padding:8px 10px;border:1px solid rgba(13,50,111,.16);border-radius:11px;background:#fff;color:var(--muted);font-size:11px;font-weight:800}
+.recording-destination strong{overflow:hidden;color:var(--premium-navy);font-size:13px;text-overflow:ellipsis;white-space:nowrap}
+.recording-alert{grid-column:1 / -1;margin:0;padding:9px 11px;border:1px solid #e7b5ad;border-radius:11px;background:#fff0ee;color:#9a2920;font-size:13px;font-weight:800;line-height:1.35}
+.recording-alert.success{border-color:#a8d8b9;background:#effaf2;color:#16713c}
 .broadcast-panel{border-color:rgba(216,170,61,.55);box-shadow:0 14px 32px rgba(8,25,58,.12)}
 .broadcast-panel>.panel-title{background:radial-gradient(circle at 90% 10%,rgba(245,220,140,.32),transparent 14rem),linear-gradient(180deg,#fbfdff,#eef4fc)}
 .broadcast-current{display:grid;gap:2px;min-width:190px;padding:9px 13px;border:1px solid rgba(216,170,61,.58);border-radius:13px;background:linear-gradient(145deg,#fffef8,#fff4ce);text-align:right}

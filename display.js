@@ -419,8 +419,22 @@
   async function captureSummary(){
     if(!window.html2canvas){ alert("ยังโหลดเครื่องมือบันทึกภาพไม่สำเร็จ โปรดตรวจการเชื่อมต่ออินเทอร์เน็ตแล้วลองอีกครั้ง"); return; }
     const canvas = await window.html2canvas(displayMain, { backgroundColor:"#ffffff", scale:2, useCORS:true });
-    const link = document.createElement("a");
-    link.download = "rapee69-draw-summary.png"; link.href = canvas.toDataURL("image/png"); link.click();
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+    if(!blob) throw new Error("สร้างไฟล์ภาพไม่สำเร็จ");
+    const stage = forcedStage || state.stage || "official";
+    const date = new Date();
+    const stamp = `${date.getFullYear() + 543}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    const fileName = `rapee69_${stamp}_${stage}.png`;
+    let folder = null;
+    try {
+      folder = await window.DrawFileStore?.getActiveFolder?.();
+      if(folder) await window.DrawFileStore.writeBlob(fileName, blob, folder);
+      else window.DrawFileStore?.fallbackDownload?.(fileName, blob);
+    } catch {
+      window.DrawFileStore?.fallbackDownload?.(fileName, blob);
+    }
+    window.opener?.postMessage({ type:"rapee69-file-saved", label:"ภาพตาราง", name:fileName, folder:folder?.name || "Downloads" }, location.origin);
+    setTimeout(() => window.close(), 600);
   }
   window.DrawRemote?.start?.("display");
   pingDisplay(); setInterval(pingDisplay, 2000);
