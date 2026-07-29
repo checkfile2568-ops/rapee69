@@ -55,9 +55,6 @@
   }
 
   function introSlide(){
-    const now = new Date();
-    const today = new Intl.DateTimeFormat("th-TH", { weekday:"long", day:"numeric", month:"long", year:"numeric" }).format(now);
-    const time = new Intl.DateTimeFormat("th-TH", { hour:"2-digit", minute:"2-digit" }).format(now);
     return `
       <section class="slide">
         <div class="slide-inner intro-ceremony">
@@ -68,8 +65,8 @@
             <div class="intro-gold-line"></div>
             <div class="intro-ready">พร้อมเริ่มจับฉลาก</div>
             <div class="intro-meta">
-              <span>📅 ${today}</span>
-              <span>🕑 เวลา ${time} น.</span>
+              <span>📅 วันศุกร์ที่ 31 กรกฎาคม 2569</span>
+              <span>🕑 เวลา 14.00 น.</span>
               <span>🎥 ถ่ายทอดสดผ่าน Google Meet</span>
             </div>
           </section>
