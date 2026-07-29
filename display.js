@@ -138,14 +138,8 @@
     const last = state.confirmed[state.confirmed.length - 1];
     const lastTeam = last ? A.getTeam(last.teamId) : null;
     const phase = !state.currentPosition ? 1 : 2;
-    const potLabel = phase === 1
-      ? "กำลังจับโถที่ 1 — ตำแหน่งการแข่งขัน"
-      : "กำลังจับโถที่ 2 — หมายเลขทีม";
-    const primaryResult = phase === 1
-      ? "รอเปิดฉลากตำแหน่ง"
-      : team
-        ? `${team.id} · ${team.name}`
-        : "รอเปิดฉลากหมายเลขทีม";
+    const positionDrawn = Boolean(state.currentPosition);
+    const teamDrawn = Boolean(team);
     let status = "พร้อมเริ่มการจับฉลาก";
     if(state.currentPosition && !team) status = "กำลังรอผลจากโถที่ 2";
     if(state.currentPosition && team) status = "รอผู้ดำเนินรายการยืนยันผล";
@@ -156,9 +150,22 @@
       <section class="slide">
         <div class="slide-inner draw-display ${state.confirmed.length === 7 ? "draw-complete" : ""}">
           <div class="live-result ${highlighting ? "is-highlighted" : ""}">
-            <div class="draw-pot-label pot-${phase}">${potLabel}</div>
-            ${state.currentPosition ? `<div class="draw-position-picked">ตำแหน่งที่จับได้ · <b>${state.currentPosition}</b></div>` : ""}
-            <div class="big-position ${phase === 2 ? "team-result" : ""}">${A.escapeHtml(primaryResult)}</div>
+            <div class="ceremony-pots" aria-label="ขั้นตอนจับฉลากสองโถ">
+              <section class="ceremony-pot ${phase === 1 ? "is-active" : ""} ${positionDrawn ? "is-drawn" : ""}">
+                <div class="pot-icon" aria-hidden="true">🏺</div>
+                <span>โถที่ 1</span>
+                <strong>ตำแหน่งการแข่งขัน</strong>
+                <b>${positionDrawn ? `ผลสาย ${state.currentPosition}` : "กำลังจับโถที่ 1"}</b>
+              </section>
+              <div class="pot-flow" aria-hidden="true">→</div>
+              <section class="ceremony-pot pot-team ${phase === 2 && !teamDrawn ? "is-active" : ""} ${teamDrawn ? "is-drawn" : ""}">
+                <div class="pot-icon" aria-hidden="true">🏺</div>
+                <span>โถที่ 2</span>
+                <strong>หมายเลขทีม</strong>
+                <b>${teamDrawn ? "เปิดฉลากแล้ว" : phase === 2 ? "กำลังจับโถที่ 2" : "รอจับโถที่ 2"}</b>
+              </section>
+            </div>
+            ${teamDrawn ? `<div class="ceremony-team-reveal ${highlighting ? "revealing" : ""}"><span>ทีมที่จับได้</span><strong>${A.escapeHtml(team.name)}</strong></div>` : ""}
             <div class="live-status">${status}</div>
           </div>
           <div class="display-board">
