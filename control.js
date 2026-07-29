@@ -45,7 +45,7 @@
     return `r69-${date}-${random}`;
   }
   let mobileSession = loadMobileSession();
-  if(mobileSession) window.DrawRemote?.configure?.({ room:mobileSession.room });
+  if(mobileSession && !window.DrawFirebase?.enabled) window.DrawRemote?.configure?.({ room:mobileSession.room });
   const controlClock = document.getElementById("controlClock");
   const els = {
     openDisplayBtn:document.getElementById("openDisplayBtn"), positionSelect:document.getElementById("positionSelect"), teamSelect:document.getElementById("teamSelect"),
@@ -125,7 +125,7 @@
   }
   function displayLink(){
     const url = new URL("display.html", location.href);
-    url.searchParams.set("v", "1.9.6");
+    url.searchParams.set("v", "1.9.7");
     if(mobileSession) url.searchParams.set("room", mobileSession.room);
     return url.toString();
   }
@@ -213,7 +213,7 @@
       mobileSession = { room:createRoom(), createdAt:Date.now() };
       localStorage.setItem(MOBILE_SESSION_STORAGE_KEY, JSON.stringify(mobileSession));
     }
-    window.DrawRemote?.configure?.({ room:mobileSession.room });
+    if(!window.DrawFirebase?.enabled) window.DrawRemote?.configure?.({ room:mobileSession.room });
     persist(`เปิดรอบควบคุมมือถือ ${mobileSession.room}`);
   }
   function formatRecordingDuration(startedAt){
@@ -592,6 +592,13 @@
   });
   window.addEventListener("draw-firebase-state", event => receive(event.detail.state));
   window.addEventListener("draw-firebase-status", event => { firebaseStatus = event.detail || firebaseStatus; render(); });
+  window.addEventListener("draw-firebase-presence", event => {
+    const displayTimes = Object.values(event.detail?.presence || {}).filter(item => item?.role === "display" && Number(item.at)).map(item => Number(item.at));
+    if(displayTimes.length) lastDisplayPing = Math.max(lastDisplayPing, ...displayTimes);
+    const mobileTimes = Object.values(event.detail?.presence || {}).filter(item => item?.role === "mobile" && Number(item.at)).map(item => Number(item.at));
+    if(mobileTimes.length) lastMobilePing = Math.max(lastMobilePing, ...mobileTimes);
+    render();
+  });
   window.addEventListener("draw-remote-status", event => {
     if(mobileSession && event.detail.room && event.detail.room !== mobileSession.room) return;
     remoteOnline = Boolean(event.detail.online);
@@ -605,5 +612,5 @@
     if(mediaRecorder?.state === "recording" || mediaRecorder?.state === "paused") { event.preventDefault(); event.returnValue = "กำลังบันทึกวิดีโออยู่"; return; }
     if(state.confirmed.length < 7 && !state.locked){ event.preventDefault(); event.returnValue = "ยังจับฉลากไม่ครบ 7 ทีม และยังไม่ได้ล็อกผล"; }
   });
-  window.DrawRemote?.start?.("control"); restoreRecordingFolder(); setInterval(renderConnection, 1000); setInterval(renderReadiness, 1000); setInterval(renderMobileOnlineBadge, 1000); setInterval(renderMobileSession, 1000); setInterval(renderRecording, 1000); updateControlClock(); setInterval(updateControlClock, 1000); render();
+  if(!window.DrawFirebase?.enabled) window.DrawRemote?.start?.("control"); window.DrawFirebase?.startPresence?.("control"); restoreRecordingFolder(); setInterval(renderConnection, 1000); setInterval(renderReadiness, 1000); setInterval(renderMobileOnlineBadge, 1000); setInterval(renderMobileSession, 1000); setInterval(renderRecording, 1000); updateControlClock(); setInterval(updateControlClock, 1000); render();
 })();

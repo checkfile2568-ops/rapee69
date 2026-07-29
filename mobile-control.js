@@ -7,7 +7,7 @@
   let remoteOnline = false;
   const mobileRoom = String(new URLSearchParams(location.search).get("room") || "").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 64);
   const hasQrSession = Boolean(mobileRoom);
-  if(hasQrSession) window.DrawRemote?.configure?.({ room:mobileRoom });
+  if(hasQrSession && !window.DrawFirebase?.enabled) window.DrawRemote?.configure?.({ room:mobileRoom });
   const stageNames = { intro: "หน้าต้อนรับ", format: "รูปแบบการแข่งขัน", draw: "กำลังจับฉลาก", official: "ผลการจับฉลาก", summary: "สรุป/ผังแข่งขัน", schedule: "ตารางแข่งขัน" };
   const firebaseOnlineLabel = "Firebase Realtime API SDK Online";
   const animatedOnlineLabel = () => [...firebaseOnlineLabel].map((char, index) => `<span style="--letter:${index}">${char === " " ? "&nbsp;" : char}</span>`).join("");
@@ -22,7 +22,8 @@
   const usedPositions = () => new Set(state.confirmed.map(item => item.position));
   const usedTeams = () => new Set(state.confirmed.map(item => Number(item.teamId)));
   const needsQrSession = () => Boolean(window.DrawRemote?.enabled && !window.DrawFirebase?.enabled);
-  const canControl = () => !needsQrSession() || hasQrSession;
+  const firebaseReady = () => !window.DrawFirebase?.enabled || firebaseStatus.online;
+  const canControl = () => firebaseReady() && (!needsQrSession() || hasQrSession);
 
   function receive(nextState) {
     const incomingAt = Date.parse(nextState?.updatedAt || ""), currentAt = Date.parse(state?.updatedAt || "");
@@ -38,8 +39,7 @@
   }
   function sendMobileHeartbeat(){
     if(document.hidden || !window.DrawFirebase?.enabled) return;
-    state.mobileHeartbeatAt = new Date().toISOString();
-    window.DrawFirebase.publishState?.(state);
+    window.DrawFirebase.publishPresence?.("mobile");
   }
 
   function choosePosition(position) {
@@ -63,7 +63,7 @@
     if (firebaseConfigured) {
       els.syncPill.className = `mobile-sync ${firebaseStatus.online ? "online typing-online" : "offline"}`;
       els.syncPill.innerHTML = firebaseStatus.online ? animatedOnlineLabel() : "● Firebase Realtime API SDK กำลังเชื่อมต่อ";
-      els.hint.textContent = firebaseStatus.online ? "คำสั่งจากหน้านี้จะส่งไปยังคอมและจอนำเสนอทันที" : "ตรวจสอบอินเทอร์เน็ตและค่า Firebase หากสถานะไม่เปลี่ยนเป็นสีเขียว";
+      els.hint.textContent = firebaseStatus.online ? "พร้อมควบคุม — คำสั่งจะส่งไปยังคอมและจอนำเสนอทันที" : "กำลังเชื่อมต่อใหม่อัตโนมัติ โปรดรอให้สถานะเป็นสีเขียวก่อนกดควบคุม";
       return;
     }
     if (window.DrawRemote?.enabled) {
@@ -174,14 +174,16 @@
     receive(event.detail.state);
   });
   window.addEventListener("draw-firebase-state", event => receive(event.detail.state));
-  window.addEventListener("draw-firebase-status", event => { firebaseStatus = event.detail || firebaseStatus; renderSync(); if(firebaseStatus.online) sendMobileHeartbeat(); });
+  window.addEventListener("draw-firebase-status", event => { firebaseStatus = event.detail || firebaseStatus; render(); if(firebaseStatus.online) sendMobileHeartbeat(); });
   window.addEventListener("draw-remote-status", event => { remoteOnline = Boolean(event.detail?.online); renderSync(); });
   document.addEventListener("visibilitychange", () => {
-    if(!document.hidden && hasQrSession) window.DrawRemote?.ping?.("mobile");
-    if(!document.hidden) sendMobileHeartbeat();
+    if(!document.hidden && hasQrSession && !window.DrawFirebase?.enabled) window.DrawRemote?.ping?.("mobile");
+    if(!document.hidden) { window.DrawFirebase?.reconnect?.(); sendMobileHeartbeat(); }
   });
-  window.addEventListener("online", () => { if(hasQrSession) window.DrawRemote?.ping?.("mobile"); });
-  if(!needsQrSession() || hasQrSession) window.DrawRemote?.start?.("mobile");
-  setInterval(sendMobileHeartbeat, 12000);
+  window.addEventListener("online", () => { if(hasQrSession && !window.DrawFirebase?.enabled) window.DrawRemote?.ping?.("mobile"); window.DrawFirebase?.reconnect?.(); });
+  window.addEventListener("offline", render);
+  if(!window.DrawFirebase?.enabled && (!needsQrSession() || hasQrSession)) window.DrawRemote?.start?.("mobile");
+  window.DrawFirebase?.startPresence?.("mobile");
+  setInterval(sendMobileHeartbeat, 8000);
   render();
 })();

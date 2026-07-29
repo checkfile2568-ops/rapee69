@@ -431,7 +431,8 @@
   window.addEventListener("draw-firebase-status", event => { firebaseStatus = event.detail || firebaseStatus; renderFirebaseStatus(); });
   function pingDisplay(){
     window.drawChannel?.postMessage({ type:"display-presence", at:Date.now() });
-    window.DrawRemote?.ping?.("display");
+    if(!window.DrawFirebase?.enabled) window.DrawRemote?.ping?.("display");
+    window.DrawFirebase?.publishPresence?.("display");
   }
   function updateClock(){
     const now = new Date();
@@ -462,7 +463,7 @@
     window.opener?.postMessage({ type:"rapee69-file-saved", label:"ภาพตาราง", name:fileName, folder:folder?.name || "Downloads" }, location.origin);
     setTimeout(() => window.close(), 600);
   }
-  window.DrawRemote?.start?.("display");
+  if(!window.DrawFirebase?.enabled) window.DrawRemote?.start?.("display"); window.DrawFirebase?.startPresence?.("display");
   pingDisplay(); setInterval(pingDisplay, 2000);
   updateClock(); setInterval(updateClock, 1000);
   setInterval(renderRecordingIndicator, 1000);

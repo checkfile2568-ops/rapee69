@@ -61,8 +61,8 @@
     state.updatedAt = new Date().toISOString();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     if(window.drawChannel) window.drawChannel.postMessage({ type: message, state });
-    window.DrawRemote?.publishState?.(state);
-    window.DrawFirebase?.publishState?.(state);
+    if(window.DrawFirebase?.enabled) window.DrawFirebase.publishState?.(state);
+    else window.DrawRemote?.publishState?.(state);
     window.dispatchEvent(new CustomEvent("draw-state-changed", { detail: state }));
     return state;
   }
