@@ -34,6 +34,11 @@
     state = A.saveState(state, "mobile-update");
     render();
   }
+  function sendMobileHeartbeat(){
+    if(document.hidden || !window.DrawFirebase?.enabled) return;
+    state.mobileHeartbeatAt = new Date().toISOString();
+    window.DrawFirebase.publishState?.(state);
+  }
 
   function choosePosition(position) {
     if (!canControl() || state.locked || (usedPositions().has(position) && state.currentPosition !== position)) return;
@@ -167,12 +172,14 @@
     receive(event.detail.state);
   });
   window.addEventListener("draw-firebase-state", event => receive(event.detail.state));
-  window.addEventListener("draw-firebase-status", event => { firebaseStatus = event.detail || firebaseStatus; renderSync(); });
+  window.addEventListener("draw-firebase-status", event => { firebaseStatus = event.detail || firebaseStatus; renderSync(); if(firebaseStatus.online) sendMobileHeartbeat(); });
   window.addEventListener("draw-remote-status", event => { remoteOnline = Boolean(event.detail?.online); renderSync(); });
   document.addEventListener("visibilitychange", () => {
     if(!document.hidden && hasQrSession) window.DrawRemote?.ping?.("mobile");
+    if(!document.hidden) sendMobileHeartbeat();
   });
   window.addEventListener("online", () => { if(hasQrSession) window.DrawRemote?.ping?.("mobile"); });
   if(!needsQrSession() || hasQrSession) window.DrawRemote?.start?.("mobile");
+  setInterval(sendMobileHeartbeat, 12000);
   render();
 })();

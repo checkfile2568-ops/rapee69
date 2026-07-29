@@ -39,7 +39,7 @@
     undoBtn:document.getElementById("undoBtn"), lockBtn:document.getElementById("lockBtn"), modeBtn:document.getElementById("modeBtn"), rehearsalRandomBtn:document.getElementById("rehearsalRandomBtn"),
     currentRound:document.getElementById("currentRound"), currentPosition:document.getElementById("currentPosition"), currentTeam:document.getElementById("currentTeam"), currentStatus:document.getElementById("currentStatus"), groupASlots:document.getElementById("groupASlots"),
     groupBSlots:document.getElementById("groupBSlots"), historyList:document.getElementById("historyList"), scheduleBody:document.getElementById("scheduleBody"), progressPill:document.getElementById("progressPill"),
-    modePill:document.getElementById("modePill"), connectionPill:document.getElementById("connectionPill"), readinessList:document.getElementById("readinessList"), stateTime:document.getElementById("stateTime"), firebaseStatus:document.getElementById("controlFirebaseStatus"), liveStageName:document.getElementById("liveStageName"),
+    modePill:document.getElementById("modePill"), connectionPill:document.getElementById("connectionPill"), readinessList:document.getElementById("readinessList"), stateTime:document.getElementById("stateTime"), firebaseStatus:document.getElementById("controlFirebaseStatus"), liveStageName:document.getElementById("liveStageName"), mobileOnlineBadge:document.getElementById("mobileOnlineBadge"),
     lockedAlert:document.getElementById("lockedAlert"), copySummaryBtn:document.getElementById("copySummaryBtn"), downloadJsonBtn:document.getElementById("downloadJsonBtn"), printBtn:document.getElementById("printBtn"),
     captureBtn:document.getElementById("captureBtn"), captureStageSelect:document.getElementById("captureStageSelect"), resetBtn:document.getElementById("resetBtn"),
     recordStartBtn:document.getElementById("recordStartBtn"), recordStopBtn:document.getElementById("recordStopBtn"), recordStartPanelBtn:document.getElementById("recordStartPanelBtn"), recordStopPanelBtn:document.getElementById("recordStopPanelBtn"), recordingPill:document.getElementById("recordingPill"), recordingStatus:document.getElementById("recordingStatus"),
@@ -89,11 +89,13 @@
     els.connectionPill.title = window.DrawFirebase?.enabled ? "ซิงก์ผ่าน Firebase Realtime Database" : (window.DrawRemote?.enabled ? (remoteOnline ? "ตรวจผ่านการซิงก์ข้ามเครื่อง" : "กำลังเชื่อมต่อบริการซิงก์") : "ตรวจจากจอที่เปิดในเบราว์เซอร์/เครื่องเดียวกัน");
   }
   function renderReadiness(){
+    const mobile = mobileConnectionState();
     const checks = [
       [state.mode === "live", "อยู่โหมดถ่ายทอดสด"],
       [state.confirmed.length === 0 || state.mode === "live", "ไม่มีผลจากโหมดซ้อมค้างอยู่"],
       [!state.locked, "ไม่ได้ล็อกอยู่"],
-      [displayConnected(), "เปิดจอนำเสนอแล้ว"]
+      [displayConnected(), "เปิดจอนำเสนอแล้ว"],
+      [mobile.online, mobile.readinessLabel]
     ];
     els.readinessList.innerHTML = checks.map(([ok, label]) => `<li class="${ok ? "ready" : "not-ready"}">${ok ? "✓" : "!"} ${label}</li>`).join("");
   }
@@ -105,7 +107,7 @@
   }
   function displayLink(){
     const url = new URL("display.html", location.href);
-    url.searchParams.set("v", "1.8.1");
+    url.searchParams.set("v", "1.8.2");
     if(mobileSession) url.searchParams.set("room", mobileSession.room);
     return url.toString();
   }
@@ -132,7 +134,25 @@
     els.firebaseStatus.innerHTML = firebaseStatus.online ? animatedOnlineLabel() : configured ? "● Firebase Realtime API SDK กำลังเชื่อมต่อ" : "● Firebase Realtime API SDK ไม่ได้ตั้งค่า";
     els.firebaseStatus.title = firebaseStatus.error || "";
   }
-  function mobileAge(){ return lastMobilePing ? Math.max(0, Math.round((Date.now() - lastMobilePing) / 1000)) : null; }
+  function mobileAge(){
+    const firebaseHeartbeat = Date.parse(state.mobileHeartbeatAt || "");
+    const lastSeen = Math.max(lastMobilePing, Number.isFinite(firebaseHeartbeat) ? firebaseHeartbeat : 0);
+    return lastSeen ? Math.max(0, Math.round((Date.now() - lastSeen) / 1000)) : null;
+  }
+  function mobileConnectionState(){
+    const age = mobileAge();
+    if(age !== null && age < 20) return { online:true, tone:"online", label:"● มือถือควบคุมออนไลน์", readinessLabel:"มือถือควบคุมเชื่อมต่อแล้ว" };
+    if(!cloudSyncEnabled()) return { online:false, tone:"waiting", label:"● รอการตั้งค่ามือถือ", readinessLabel:"ยังไม่ได้ตั้งค่าการควบคุมมือถือ" };
+    if(age !== null && age < 180) return { online:false, tone:"idle", label:"● มือถือพักหน้าจอ", readinessLabel:"มือถือพักหน้าจอ — QR เดิมยังใช้ได้" };
+    return { online:false, tone:"waiting", label:"● รอมือถือเชื่อมต่อ", readinessLabel:"รอมือถือสแกน QR หรือเปิดลิงก์เดิม" };
+  }
+  function renderMobileOnlineBadge(){
+    if(!els.mobileOnlineBadge) return;
+    const mobile = mobileConnectionState();
+    els.mobileOnlineBadge.className = `header-mobile-status ${mobile.tone}`;
+    els.mobileOnlineBadge.textContent = mobile.label;
+    els.mobileOnlineBadge.title = mobile.online ? "มือถือพร้อมส่งคำสั่งควบคุม" : "สถานะจะเปลี่ยนเป็นสีเขียวเมื่อมือถือเชื่อมต่ออยู่";
+  }
   function renderMobileSession(){
     const ready = cloudSyncEnabled();
     const link = mobileLink();
@@ -278,7 +298,7 @@
     els.lockBtn.textContent = state.locked ? "🔓 ปลดล็อกผล" : "🔒 ล็อกผล"; els.lockedAlert.hidden = !state.locked;
     els.progressPill.textContent = `ครั้งที่ ${Math.min(state.confirmed.length + 1, 7)} จาก 7`; els.stateTime.textContent = `บันทึกล่าสุด ${A.formatThaiTime(state.updatedAt)}`;
     els.confirmBtn.disabled = state.locked || !state.currentPosition || !state.currentTeamId; els.undoBtn.disabled = state.locked || !state.confirmed.length;
-    renderConnection(); renderReadiness(); renderMobileSession(); renderFirebaseStatus(); renderRecording();
+    renderConnection(); renderReadiness(); renderMobileOnlineBadge(); renderMobileSession(); renderFirebaseStatus(); renderRecording();
     clearTimeout(highlightTimer);
     if(state.pendingRevealUntil > Date.now()) highlightTimer = setTimeout(render, state.pendingRevealUntil - Date.now() + 30);
   }
@@ -384,5 +404,5 @@
     if(mediaRecorder?.state === "recording" || mediaRecorder?.state === "paused") { event.preventDefault(); event.returnValue = "กำลังบันทึกวิดีโออยู่"; return; }
     if(state.confirmed.length < 7 && !state.locked){ event.preventDefault(); event.returnValue = "ยังจับฉลากไม่ครบ 7 ทีม และยังไม่ได้ล็อกผล"; }
   });
-  window.DrawRemote?.start?.("control"); setInterval(renderConnection, 1000); setInterval(renderReadiness, 1000); setInterval(renderRecording, 1000); updateControlClock(); setInterval(updateControlClock, 1000); render();
+  window.DrawRemote?.start?.("control"); setInterval(renderConnection, 1000); setInterval(renderReadiness, 1000); setInterval(renderMobileOnlineBadge, 1000); setInterval(renderMobileSession, 1000); setInterval(renderRecording, 1000); updateControlClock(); setInterval(updateControlClock, 1000); render();
 })();

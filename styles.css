@@ -75,6 +75,9 @@ h1{font-size:clamp(34px,5vw,62px);line-height:1.05;margin:0}
 .app-header h1{font-size:27px}
 .header-meta{color:#dbe8ff;font-size:14px}
 .header-actions{display:flex;gap:10px;flex-wrap:wrap}
+.header-mobile-status{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 13px;border:1px solid rgba(255,255,255,.28);border-radius:12px;background:rgba(255,255,255,.06);color:#fff3c4;font-size:13px;font-weight:900;line-height:1;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.header-mobile-status.online{border-color:rgba(126,242,168,.7);background:rgba(18,125,62,.30);color:#c9f5d6;box-shadow:0 0 0 1px rgba(39,183,91,.12),inset 0 1px 0 rgba(255,255,255,.09)}
+.header-mobile-status.idle,.header-mobile-status.waiting{border-color:rgba(245,220,140,.50);background:rgba(170,126,17,.18);color:#fff0ba}
 .recording-panel .panel-title{align-items:flex-start}.recording-subtitle{margin-top:3px;color:var(--muted);font-size:13px;font-weight:700}.recording-body{display:flex;align-items:center;justify-content:space-between;gap:16px}.recording-actions{display:flex;flex-wrap:wrap;gap:9px}.recording-status{margin:0;color:var(--navy-800);font-weight:700;line-height:1.4}.pill.recording{background:#ffebe9;color:#ab2219;animation:recording-pulse 1.25s ease-in-out infinite}
 .control-shell{width:min(1480px,calc(100% - 28px));margin:22px auto 50px}
 .control-grid{display:grid;grid-template-columns:minmax(360px,.9fr) minmax(520px,1.35fr);gap:20px;align-items:start}
@@ -941,7 +944,7 @@ h1,h2,h3,.display-title,.group-head,.format-big,.big-position,.big-team,
 @media (max-width:760px){
   .app-header{position:static;align-items:flex-start;padding:11px 13px}
   .app-header h1{font-size:clamp(19px,5.1vw,25px);line-height:1.18}
-  .header-meta{font-size:12px}.header-actions{gap:7px}.header-actions .btn{padding:8px 10px;font-size:12px}
+  .header-meta{font-size:12px}.header-actions{gap:7px}.header-actions .btn{padding:8px 10px;font-size:12px}.header-mobile-status{min-height:36px;padding:0 10px;font-size:12px}
   .control-shell{width:min(100% - 20px,1480px);margin:12px auto 34px}
   .control-grid{grid-template-columns:1fr;gap:14px}
   .control-setup-panel,.broadcast-panel{margin-bottom:14px}
@@ -980,7 +983,7 @@ h1,h2,h3,.display-title,.group-head,.format-big,.big-position,.big-team,
 }
 @media (max-width:440px){
   .app-header{gap:9px}.mini-crest{width:38px;height:42px;font-size:11px}.brand-lockup{gap:9px}
-  .header-actions{width:100%}.header-actions .btn{flex:1;text-align:center}
+  .header-actions{width:100%}.header-actions .btn{flex:1;text-align:center}.header-mobile-status{flex:1 1 100%;order:3}
   .control-setup-panel>.panel-title,.broadcast-panel>.panel-title{display:grid;grid-template-columns:1fr;gap:9px}
   .mode-row{justify-content:flex-start}.broadcast-current{text-align:left}
   .setup-card .readiness-list{grid-template-columns:1fr}.setup-card .readiness-list li{min-height:44px;font-size:13px}

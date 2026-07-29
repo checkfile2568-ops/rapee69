@@ -1,9 +1,9 @@
 (() => {
   "use strict";
 
-  const VERSION = "1.7";
+  const VERSION = "1.8";
   // Keep the v1.4 key/channel so an existing control computer retains its saved draw.
-  // v1.7 keeps the one-session QR bridge and adds an official full-screen draw summary.
+  // v1.8 keeps the one-session QR bridge, official draw summary, and a light mobile heartbeat.
   const STORAGE_KEY = "rapee69_draw_state_v14";
   const CHANNEL_NAME = "rapee69_draw_channel_v14";
   const STAGES = ["intro", "format", "draw", "official", "summary", "schedule"];
@@ -18,7 +18,7 @@
   const DEFAULT_STATE = {
     version: VERSION, mode: "live", stage: "intro", currentPosition: "", currentTeamId: null,
     confirmed: [], locked: false, lastAction: "พร้อมเริ่มการจับฉลาก", pendingRevealUntil: 0,
-    recording: { active:false, startedAt:"" },
+    recording: { active:false, startedAt:"" }, mobileHeartbeatAt:"",
     updatedAt: new Date().toISOString()
   };
 
@@ -35,6 +35,7 @@
     state.pendingRevealUntil = Number.isFinite(Number(state.pendingRevealUntil)) ? Number(state.pendingRevealUntil) : 0;
     const recording = state.recording && typeof state.recording === "object" ? state.recording : {};
     state.recording = { active:Boolean(recording.active), startedAt:typeof recording.startedAt === "string" ? recording.startedAt : "" };
+    state.mobileHeartbeatAt = typeof state.mobileHeartbeatAt === "string" ? state.mobileHeartbeatAt : "";
     const positions = new Set(), teams = new Set();
     state.confirmed = Array.isArray(state.confirmed) ? state.confirmed.reduce((valid, item) => {
       const position = item && item.position;

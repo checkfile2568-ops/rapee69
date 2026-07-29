@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=1.8.1" />
+  <link rel="stylesheet" href="styles.css?v=1.8.2" />
 </head>
 <body>
   <header class="app-header">
@@ -22,6 +22,7 @@
     </div>
     <div class="header-actions">
       <button class="btn ghost" id="openDisplayBtn">เปิดหน้าจอนำเสนอ</button>
+      <span id="mobileOnlineBadge" class="header-mobile-status waiting" role="status" aria-live="polite">● รอมือถือเชื่อมต่อ</span>
       <button class="btn red" id="recordStartBtn">● เริ่มบันทึกวิดีโอ</button>
       <button class="btn ghost" id="recordStopBtn" hidden>■ หยุดบันทึก</button>
       <a class="btn ghost" href="mobile-control.html" target="_blank" rel="noopener">เปิดหน้าควบคุมมือถือ</a>
@@ -257,8 +258,8 @@
   <script src="firebase-config.js?v=1.8.1"></script>
   <script src="remote-sync.js?v=1.8.1"></script>
   <script src="vendor/qrcode.min.js?v=1.0.0"></script>
-  <script src="app.js?v=1.8.1"></script>
+  <script src="app.js?v=1.8.2"></script>
   <script type="module" src="firebase-sync.js?v=1.8.1"></script>
-  <script src="control.js?v=1.8.1"></script>
+  <script src="control.js?v=1.8.2"></script>
 </body>
 </html>
