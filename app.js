@@ -9,10 +9,10 @@
   const STAGES = ["intro", "format", "draw", "official", "summary", "schedule"];
   const MODES = ["live", "rehearsal"];
   const TEAMS = [
-    { id: 1, name: "ทีมรวมศาลจังหวัดลพบุรี" }, { id: 2, name: "ทีมอัยการ" },
-    { id: 3, name: "ทีมตำรวจภูธรจังหวัดลพบุรี" }, { id: 4, name: "ทีมศูนย์ฝึกและอบรมเด็กและเยาวชนลพบุรี" },
-    { id: 5, name: "ทีมทนายความจังหวัดลพบุรี" }, { id: 6, name: "ทีม สภ.ท่าหิน" },
-    { id: 7, name: "ทีมเรือนจำกลางลพบุรี" }
+    { id: 1, name: "ทีมรวมศาลจังหวัดลพบุรี", short: "ศาลจังหวัด", color: "#1d4ed8" }, { id: 2, name: "ทีมอัยการ", short: "อัยการ", color: "#7c3aed" },
+    { id: 3, name: "ทีมตำรวจภูธรจังหวัดลพบุรี", short: "ตำรวจภูธร", color: "#0e7490" }, { id: 4, name: "ทีมศูนย์ฝึกและอบรมเด็กและเยาวชนลพบุรี", short: "ศูนย์ฝึกฯ เยาวชน", color: "#ea580c" },
+    { id: 5, name: "ทีมทนายความจังหวัดลพบุรี", short: "ทนายความ", color: "#b45309" }, { id: 6, name: "ทีม สภ.ท่าหิน", short: "สภ.ท่าหิน", color: "#be123c" },
+    { id: 7, name: "ทีมเรือนจำกลางลพบุรี", short: "เรือนจำกลาง", color: "#15803d" }
   ];
   const POSITIONS = ["A1", "A2", "A3", "B1", "B2", "B3", "B4"];
   const DEFAULT_STATE = {
@@ -80,7 +80,11 @@
     const map = getPairMap(state), newest = state.confirmed.at(-1)?.position;
     return POSITIONS.filter(p => p.startsWith(group)).map(position => {
       const team = map[position], justAdded = team && position === newest;
-      return `<div class="slot ${team ? "" : "empty"}${justAdded ? " just-added" : ""}"><div class="slot-code">${position}</div><div class="slot-name">${team ? escapeHtml(team.name) : "รอจับฉลาก"}</div></div>`;
+      const style = team?.color ? ` style="border-left-color:${team.color}"` : "";
+      const name = team
+        ? `<div class="slot-name"><span class="slot-short">${escapeHtml(team.short || team.name)}</span><span class="slot-full">${escapeHtml(team.name)}</span></div>`
+        : `<div class="slot-name">รอจับฉลาก</div>`;
+      return `<div class="slot ${team ? "" : "empty"}${justAdded ? " just-added" : ""}"${style}><div class="slot-code">${position}</div>${name}</div>`;
     }).join("");
   }
   function buildScheduleRows(state){

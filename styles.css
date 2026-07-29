@@ -231,6 +231,7 @@ select,input[type="text"]{
 .display-board{display:grid;grid-template-rows:minmax(0,1fr) auto auto;min-height:0;gap:8px}
 .display-board .board-grid{min-height:0;height:100%;align-items:stretch}.display-board .group-card{display:flex;height:100%;min-height:0;flex-direction:column;background:#fff}.display-board .group-head{padding:9px 13px;font-size:clamp(19px,1.65vw,27px)}.display-board .slot-list{display:grid;min-height:0;flex:1;grid-auto-rows:minmax(0,1fr);padding:5px 7px}.display-board .slot{min-height:0;grid-template-columns:clamp(42px,3.8vw,56px) minmax(0,1fr);gap:8px;padding:5px 7px;margin:2px 0}
 .display-board .slot-name{min-width:0;font-size:clamp(14px,1.32vw,22px);line-height:1.14;overflow-wrap:anywhere;word-break:break-word}
+.slot-name{display:grid;min-width:0;gap:2px}.slot-short{color:var(--navy-950);font-size:1em;font-weight:900;line-height:1.1}.slot-full{color:#64748b;font-size:.62em;font-weight:700;line-height:1.18;overflow-wrap:anywhere}.slot.empty .slot-name{display:block;color:#98a2b3;font-weight:500}
 .display-board .slot-code{font-size:clamp(20px,2vw,31px)}
 .last-result-bar{
   display:grid;justify-items:center;align-content:center;gap:4px;
