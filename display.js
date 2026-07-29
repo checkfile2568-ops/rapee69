@@ -33,6 +33,11 @@
     displayRecordingIndicator.hidden = !recording.active;
     if(recording.active) displayRecordingIndicator.textContent = `● กำลังบันทึกวิดีโอ ${[hours, minutes, seconds].map(value => String(value).padStart(2, "0")).join(":")}`;
   }
+  function receive(nextState){
+    const incomingAt = Date.parse(nextState?.updatedAt || ""), currentAt = Date.parse(state?.updatedAt || "");
+    if(Number.isFinite(incomingAt) && Number.isFinite(currentAt) && incomingAt < currentAt) return;
+    state = A.normalizeState(nextState); render();
+  }
 
   const teamListHtml = A.TEAMS.map(team => `
     <div class="team-number"><b>${team.id}</b><span>${A.escapeHtml(team.name)}</span></div>
@@ -383,11 +388,11 @@
 
   if(window.drawChannel){
     window.drawChannel.addEventListener("message", event => {
-      if(event.data?.state){ state = A.normalizeState(event.data.state); render(); }
+      if(event.data?.state) receive(event.data.state);
     });
   }
   window.addEventListener("storage", event => {
-    if(event.key === A.STORAGE_KEY){ state = A.loadState(); render(); }
+    if(event.key === A.STORAGE_KEY) receive(A.loadState());
   });
   window.addEventListener("keydown", event => {
     if(event.key.toLowerCase() === "f"){ document.documentElement.requestFullscreen?.(); return; }
@@ -399,9 +404,9 @@
   });
   window.addEventListener("draw-remote-state", event => {
     if(event.detail.room && window.DrawRemote?.room && event.detail.room !== window.DrawRemote.room) return;
-    state = A.normalizeState(event.detail.state); render();
+    receive(event.detail.state);
   });
-  window.addEventListener("draw-firebase-state", event => { state = A.normalizeState(event.detail.state); render(); });
+  window.addEventListener("draw-firebase-state", event => receive(event.detail.state));
   window.addEventListener("draw-firebase-status", event => { firebaseStatus = event.detail || firebaseStatus; renderFirebaseStatus(); });
   function pingDisplay(){
     window.drawChannel?.postMessage({ type:"display-presence", at:Date.now() });

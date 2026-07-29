@@ -25,6 +25,8 @@
   const canControl = () => !needsQrSession() || hasQrSession;
 
   function receive(nextState) {
+    const incomingAt = Date.parse(nextState?.updatedAt || ""), currentAt = Date.parse(state?.updatedAt || "");
+    if(Number.isFinite(incomingAt) && Number.isFinite(currentAt) && incomingAt < currentAt) return;
     state = A.normalizeState(nextState);
     render();
   }

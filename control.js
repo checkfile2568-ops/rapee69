@@ -74,7 +74,11 @@
   }
   const displayConnected = () => Date.now() - lastDisplayPing < 5500;
   function persist(action){ state.lastAction = action; state = A.saveState(state, "update"); render(); }
-  function receive(next){ state = A.normalizeState(next); render(); }
+  function receive(next){
+    const incomingAt = Date.parse(next?.updatedAt || ""), currentAt = Date.parse(state?.updatedAt || "");
+    if(Number.isFinite(incomingAt) && Number.isFinite(currentAt) && incomingAt < currentAt) return;
+    state = A.normalizeState(next); render();
+  }
   function renderSelects(){
     const positions = usedPositions(), teams = usedTeams(), currentP = state.currentPosition || "", currentT = Number(state.currentTeamId) || null;
     els.positionSelect.innerHTML = `<option value="">— เลือก A1 ถึง B4 —</option>` + A.POSITIONS.filter(p => !positions.has(p) || p === currentP).map(p => `<option value="${p}" ${p === currentP ? "selected" : ""}>${p}</option>`).join("");
@@ -506,6 +510,11 @@
     clearTimeout(drawFocusTimer);
     drawFocusTimer = setTimeout(() => target.classList.remove("draw-workflow-focus"), 3000);
   }
+  function advanceToTeamSelection(){
+    const touchDevice = matchMedia("(pointer:coarse)").matches || navigator.maxTouchPoints > 0;
+    if(touchDevice) els.teamSelect.scrollIntoView({ behavior:"smooth", block:"center" });
+    else els.teamSelect.focus({ preventScroll:true });
+  }
   document.querySelectorAll("[data-stage]").forEach(button => button.addEventListener("click", () => {
     state.stage = button.dataset.stage;
     persist(`เปลี่ยนหน้าจอเป็น ${button.textContent.trim()}`);
@@ -515,7 +524,7 @@
     const value = els.positionSelect.value;
     if(!value) return;
     if(usedPositions().has(value) && value !== state.currentPosition) return alert("ตำแหน่งนี้ถูกใช้แล้ว");
-    state.currentPosition = value; state.stage = "draw"; persist(`แสดงตำแหน่ง ${value}`);
+    state.currentPosition = value; state.stage = "draw"; persist(`แสดงตำแหน่ง ${value}`); requestAnimationFrame(advanceToTeamSelection);
   });
   els.teamSelect.addEventListener("change", () => {
     const id = Number(els.teamSelect.value), team = A.getTeam(id);
