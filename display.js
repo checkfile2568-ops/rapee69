@@ -66,7 +66,7 @@
             <div class="intro-eyebrow">ศาลจังหวัดลพบุรี</div>
             <h1>จับฉลากแบ่งสาย <span>ฟุตบอล 7 คน วันรพี 69</span></h1>
             <div class="intro-gold-line"></div>
-            <div class="intro-ready">พร้อมเริ่มพิธีจับฉลาก</div>
+            <div class="intro-ready">พร้อมเริ่มจับฉลาก</div>
             <div class="intro-meta">
               <span>📅 ${today}</span>
               <span>🕑 เวลา ${time} น.</span>

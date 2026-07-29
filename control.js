@@ -96,7 +96,7 @@
   }
   function displayLink(){
     const url = new URL("display.html", location.href);
-    url.searchParams.set("v", "1.7.8");
+    url.searchParams.set("v", "1.7.9");
     if(mobileSession) url.searchParams.set("room", mobileSession.room);
     return url.toString();
   }
