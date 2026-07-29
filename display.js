@@ -69,7 +69,7 @@
     const teams = A.TEAMS.filter(team => !usedTeams.has(team.id));
     return `<section class="remaining-draw" aria-label="ฉลากที่เหลือ">
       <div class="remaining-card positions"><strong>ตำแหน่งที่เหลือในโถ</strong><span>${positions.map(item => `<b class="${item.startsWith("A") ? "a" : "b"}">${item}</b>`).join("") || "ครบแล้ว"}</span></div>
-      <div class="remaining-card teams"><strong>หมายเลขทีมที่เหลือในโถ</strong><span>${teams.map(team => `<b>${team.id}</b>`).join("") || "ครบแล้ว"}</span></div>
+      <div class="remaining-card teams"><strong>หมายเลขทีมที่เหลือในโถ</strong><span class="remaining-team-list">${teams.map(team => `<span class="remaining-team team-${team.id}" title="${A.escapeHtml(team.name)}"><i>${team.id}</i>${A.escapeHtml(compactTeamName(team))}</span>`).join("") || "ครบแล้ว"}</span></div>
     </section>`;
   }
 
@@ -137,9 +137,6 @@
     const highlighting = team && Date.now() < state.pendingRevealUntil;
     const last = state.confirmed[state.confirmed.length - 1];
     const lastTeam = last ? A.getTeam(last.teamId) : null;
-    const usedTeams = new Set(state.confirmed.map(item => Number(item.teamId)));
-    const remainingTeams = A.TEAMS.filter(item => !usedTeams.has(item.id));
-    const round = Math.min(state.confirmed.length + 1, 7);
     const phase = !state.currentPosition ? 1 : 2;
     const potLabel = phase === 1
       ? "กำลังจับโถที่ 1 — ตำแหน่งการแข่งขัน"
@@ -147,7 +144,7 @@
     const primaryResult = phase === 1
       ? "รอเปิดฉลากตำแหน่ง"
       : team
-        ? `${team.id} · ${compactTeamName(team)}`
+        ? `${team.id} · ${team.name}`
         : "รอเปิดฉลากหมายเลขทีม";
     let status = "พร้อมเริ่มการจับฉลาก";
     if(state.currentPosition && !team) status = "กำลังรอผลจากโถที่ 2";
@@ -157,16 +154,11 @@
 
     return `
       <section class="slide">
-        <div class="slide-inner draw-display">
+        <div class="slide-inner draw-display ${state.confirmed.length === 7 ? "draw-complete" : ""}">
           <div class="live-result ${highlighting ? "is-highlighted" : ""}">
-            <div class="draw-team-strip" aria-label="ทีมที่ยังอยู่ในโถ">
-              ${remainingTeams.map(item => `<span class="draw-team-token team-${item.id}" title="${A.escapeHtml(item.name)}"><i>${item.id}</i>${A.escapeHtml(compactTeamName(item))}</span>`).join("")}
-            </div>
-            <div class="draw-round"><span class="draw-dots" aria-label="ความคืบหน้า ${round} จาก 7">${A.POSITIONS.map((_, index) => `<i class="${index < round ? "done" : ""}"></i>`).join("")}</span><span class="progress-label">ครั้งที่ ${round} จาก 7</span></div>
             <div class="draw-pot-label pot-${phase}">${potLabel}</div>
             ${state.currentPosition ? `<div class="draw-position-picked">ตำแหน่งที่จับได้ · <b>${state.currentPosition}</b></div>` : ""}
             <div class="big-position ${phase === 2 ? "team-result" : ""}">${A.escapeHtml(primaryResult)}</div>
-            <div class="big-team ${highlighting ? "revealing" : ""}">${team ? A.escapeHtml(team.name) : potLabel}</div>
             <div class="live-status">${status}</div>
           </div>
           <div class="display-board">
