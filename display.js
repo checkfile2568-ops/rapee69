@@ -152,17 +152,17 @@
           <div class="live-result ${highlighting ? "is-highlighted" : ""}">
             <div class="ceremony-pots" aria-label="ขั้นตอนจับฉลากสองโถ">
               <section class="ceremony-pot ${phase === 1 ? "is-active" : ""} ${positionDrawn ? "is-drawn" : ""}">
-                <div class="pot-icon" aria-hidden="true">🏺</div>
+                <div class="pot-icon" aria-hidden="true"><i></i></div>
                 <span>โถที่ 1</span>
                 <strong>ตำแหน่งการแข่งขัน</strong>
-                <b>${positionDrawn ? `ผลสาย ${state.currentPosition}` : "กำลังจับโถที่ 1"}</b>
+                <div class="pot-result ${positionDrawn ? "position-result" : ""}">${positionDrawn ? `<span>ผลสาย</span><strong>${state.currentPosition}</strong>` : "กำลังจับโถที่ 1"}</div>
               </section>
               <div class="pot-flow" aria-hidden="true">→</div>
               <section class="ceremony-pot pot-team ${phase === 2 && !teamDrawn ? "is-active" : ""} ${teamDrawn ? "is-drawn" : ""}">
-                <div class="pot-icon" aria-hidden="true">🏺</div>
+                <div class="pot-icon" aria-hidden="true"><i></i></div>
                 <span>โถที่ 2</span>
                 <strong>หมายเลขทีม</strong>
-                <b>${teamDrawn ? "เปิดฉลากแล้ว" : phase === 2 ? "กำลังจับโถที่ 2" : "รอจับโถที่ 2"}</b>
+                <div class="pot-result">${teamDrawn ? "เปิดฉลากแล้ว" : phase === 2 ? "กำลังจับโถที่ 2" : "รอจับโถที่ 2"}</div>
               </section>
             </div>
             ${teamDrawn ? `<div class="ceremony-team-reveal ${highlighting ? "revealing" : ""}"><span>ทีมที่จับได้</span><strong>${A.escapeHtml(team.name)}</strong></div>` : ""}
