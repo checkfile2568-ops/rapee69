@@ -18,6 +18,7 @@
   const DEFAULT_STATE = {
     version: VERSION, mode: "live", stage: "intro", currentPosition: "", currentTeamId: null,
     confirmed: [], locked: false, lastAction: "พร้อมเริ่มการจับฉลาก", pendingRevealUntil: 0,
+    recording: { active:false, startedAt:"" },
     updatedAt: new Date().toISOString()
   };
 
@@ -32,6 +33,8 @@
     state.currentPosition = POSITIONS.includes(state.currentPosition) ? state.currentPosition : "";
     state.currentTeamId = TEAMS.some(team => team.id === Number(state.currentTeamId)) ? Number(state.currentTeamId) : null;
     state.pendingRevealUntil = Number.isFinite(Number(state.pendingRevealUntil)) ? Number(state.pendingRevealUntil) : 0;
+    const recording = state.recording && typeof state.recording === "object" ? state.recording : {};
+    state.recording = { active:Boolean(recording.active), startedAt:typeof recording.startedAt === "string" ? recording.startedAt : "" };
     const positions = new Set(), teams = new Set();
     state.confirmed = Array.isArray(state.confirmed) ? state.confirmed.reduce((valid, item) => {
       const position = item && item.position;

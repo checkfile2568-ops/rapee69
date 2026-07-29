@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=1.7.6" />
+  <link rel="stylesheet" href="styles.css?v=1.7.11" />
 </head>
 <body>
   <header class="app-header">
@@ -22,6 +22,8 @@
     </div>
     <div class="header-actions">
       <button class="btn ghost" id="openDisplayBtn">เปิดหน้าจอนำเสนอ</button>
+      <button class="btn red" id="recordStartBtn">● เริ่มบันทึกวิดีโอ</button>
+      <button class="btn ghost" id="recordStopBtn" hidden>■ หยุดบันทึก</button>
       <a class="btn ghost" href="mobile-control.html" target="_blank" rel="noopener">เปิดหน้าควบคุมมือถือ</a>
       <a class="btn ghost" href="index.html">หน้าหลัก</a>
     </div>
@@ -46,6 +48,20 @@
           <button class="btn stage" data-stage="schedule">6. ตารางแข่งขัน</button>
         </div>
         <div class="keyboard-hint">คีย์ลัดหน้าจอนำเสนอ: <strong>1–6</strong> เปลี่ยนหน้า · <strong>F</strong> เต็มจอ</div>
+      </div>
+    </section>
+
+    <section class="panel recording-panel" style="margin-bottom:20px">
+      <div class="panel-title">
+        <div><h2>บันทึกวิดีโอจอนำเสนอ</h2><div class="recording-subtitle">เลือกหน้าต่าง “หน้าจอนำเสนอ” ในกล่อง Chrome และเลือกแชร์เสียงระบบเมื่อมี</div></div>
+        <span id="recordingPill" class="pill">ยังไม่ได้บันทึก</span>
+      </div>
+      <div class="panel-body recording-body">
+        <div class="recording-actions">
+          <button class="btn red" id="recordStartPanelBtn">● เริ่มบันทึกวิดีโอ</button>
+          <button class="btn" id="recordStopPanelBtn" hidden>■ หยุดและบันทึกไฟล์</button>
+        </div>
+        <p id="recordingStatus" class="recording-status">ไฟล์จะบันทึกเป็น WebM ลงในเครื่องนี้เมื่อกดหยุดบันทึก</p>
       </div>
     </section>
 
@@ -209,8 +225,8 @@
   <script src="firebase-config.js?v=1.7.2"></script>
   <script src="remote-sync.js?v=1.7.0"></script>
   <script src="vendor/qrcode.min.js?v=1.0.0"></script>
-  <script src="app.js?v=1.7.0"></script>
+  <script src="app.js?v=1.7.11"></script>
   <script type="module" src="firebase-sync.js?v=1.7.0"></script>
-  <script src="control.js?v=1.7.10"></script>
+  <script src="control.js?v=1.7.11"></script>
 </body>
 </html>

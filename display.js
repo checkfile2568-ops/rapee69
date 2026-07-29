@@ -7,6 +7,7 @@
   const liveClock = document.getElementById("liveClock");
   const liveUpdated = document.getElementById("liveUpdated");
   const displayFirebaseStatus = document.getElementById("displayFirebaseStatus");
+  const displayRecordingIndicator = document.getElementById("displayRecordingIndicator");
   let firebaseStatus = { enabled: Boolean(window.DrawFirebase?.enabled), online: false, error: "" };
   const params = new URLSearchParams(location.search);
   const forcedStage = A.STAGES.includes(params.get("stage")) ? params.get("stage") : "";
@@ -23,6 +24,14 @@
     displayFirebaseStatus.className = `firebase-status display-firebase-status ${firebaseStatus.online ? "online typing-online" : configured ? "checking" : "offline"}`;
     displayFirebaseStatus.innerHTML = firebaseStatus.online ? animatedOnlineLabel() : configured ? "● Firebase Realtime API SDK กำลังเชื่อมต่อ" : "● Firebase Realtime API SDK ไม่ได้ตั้งค่า";
     displayFirebaseStatus.title = firebaseStatus.error || "";
+  }
+  function renderRecordingIndicator(){
+    if(!displayRecordingIndicator) return;
+    const recording = state.recording || {};
+    const elapsed = Math.max(0, Date.now() - new Date(recording.startedAt || Date.now()).getTime());
+    const total = Math.floor(elapsed / 1000), hours = Math.floor(total / 3600), minutes = Math.floor((total % 3600) / 60), seconds = total % 60;
+    displayRecordingIndicator.hidden = !recording.active;
+    if(recording.active) displayRecordingIndicator.textContent = `● กำลังบันทึกวิดีโอ ${[hours, minutes, seconds].map(value => String(value).padStart(2, "0")).join(":")}`;
   }
 
   const teamListHtml = A.TEAMS.map(team => `
@@ -367,6 +376,7 @@
       intro:introSlide, format:formatSlide, draw:drawSlide, official:officialSlide, summary:summarySlide, schedule:scheduleSlide
     }[forcedStage || state.stage] || introSlide;
     displayMain.innerHTML = renderer();
+    renderRecordingIndicator();
     clearTimeout(revealTimer);
     if(state.pendingRevealUntil > Date.now()) revealTimer = setTimeout(render, state.pendingRevealUntil - Date.now() + 20);
   }
@@ -415,6 +425,7 @@
   window.DrawRemote?.start?.("display");
   pingDisplay(); setInterval(pingDisplay, 2000);
   updateClock(); setInterval(updateClock, 1000);
+  setInterval(renderRecordingIndicator, 1000);
   renderFirebaseStatus();
   render();
   if(params.get("print") === "1") setTimeout(() => window.print(), 600);

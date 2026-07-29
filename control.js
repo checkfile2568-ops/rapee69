@@ -6,6 +6,14 @@
   let lastMobilePing = 0;
   let drawFocusTimer = 0;
   let highlightTimer = 0;
+  let mediaRecorder = null;
+  let displayCaptureStream = null;
+  let microphoneStream = null;
+  let recordingAudioContext = null;
+  let recordingChunks = [];
+  let localRecordingStartedAt = 0;
+  let recordingStartPending = false;
+  let recordingNotice = "";
   let remoteOnline = false;
   let firebaseStatus = { enabled: Boolean(window.DrawFirebase?.enabled), online: false, error: "" };
   const MOBILE_SESSION_STORAGE_KEY = "rapee69_mobile_session_v16";
@@ -34,6 +42,7 @@
     modePill:document.getElementById("modePill"), connectionPill:document.getElementById("connectionPill"), readinessList:document.getElementById("readinessList"), stateTime:document.getElementById("stateTime"), firebaseStatus:document.getElementById("controlFirebaseStatus"),
     lockedAlert:document.getElementById("lockedAlert"), copySummaryBtn:document.getElementById("copySummaryBtn"), downloadJsonBtn:document.getElementById("downloadJsonBtn"), printBtn:document.getElementById("printBtn"),
     captureBtn:document.getElementById("captureBtn"), captureStageSelect:document.getElementById("captureStageSelect"), resetBtn:document.getElementById("resetBtn"),
+    recordStartBtn:document.getElementById("recordStartBtn"), recordStopBtn:document.getElementById("recordStopBtn"), recordStartPanelBtn:document.getElementById("recordStartPanelBtn"), recordStopPanelBtn:document.getElementById("recordStopPanelBtn"), recordingPill:document.getElementById("recordingPill"), recordingStatus:document.getElementById("recordingStatus"),
     startMobileSessionBtn:document.getElementById("startMobileSessionBtn"), renewMobileSessionBtn:document.getElementById("renewMobileSessionBtn"), copyMobileLinkBtn:document.getElementById("copyMobileLinkBtn"),
     mobileSessionPill:document.getElementById("mobileSessionPill"), mobileSessionCode:document.getElementById("mobileSessionCode"), mobileSessionStatus:document.getElementById("mobileSessionStatus"), mobileSessionNote:document.getElementById("mobileSessionNote"), mobileQrCanvas:document.getElementById("mobileQrCanvas")
   };
@@ -96,7 +105,7 @@
   }
   function displayLink(){
     const url = new URL("display.html", location.href);
-    url.searchParams.set("v", "1.7.10");
+    url.searchParams.set("v", "1.7.11");
     if(mobileSession) url.searchParams.set("room", mobileSession.room);
     return url.toString();
   }
@@ -169,6 +178,92 @@
     window.DrawRemote?.configure?.({ room:mobileSession.room });
     persist(`เปิดรอบควบคุมมือถือ ${mobileSession.room}`);
   }
+  function formatRecordingDuration(startedAt){
+    const elapsed = Math.max(0, Date.now() - new Date(startedAt || Date.now()).getTime());
+    const total = Math.floor(elapsed / 1000), hours = Math.floor(total / 3600), minutes = Math.floor((total % 3600) / 60), seconds = total % 60;
+    return [hours, minutes, seconds].map(value => String(value).padStart(2, "0")).join(":");
+  }
+  function recordingFileName(startedAt){
+    const stamp = new Date(startedAt).toISOString().slice(0,19).replaceAll(":", "-");
+    return `rapee69-draw-${stamp}.webm`;
+  }
+  function renderRecording(){
+    const active = Boolean(state.recording?.active);
+    const localActive = mediaRecorder?.state === "recording" || mediaRecorder?.state === "paused";
+    const busy = active || recordingStartPending;
+    const duration = active ? formatRecordingDuration(state.recording.startedAt) : "";
+    els.recordingPill.className = `pill ${active ? "recording" : ""}`;
+    els.recordingPill.textContent = active ? `● กำลังบันทึก ${duration}` : recordingStartPending ? "กำลังเลือกหน้าจอ" : "ยังไม่ได้บันทึก";
+    els.recordingStatus.textContent = recordingStartPending ? "เลือกหน้าต่าง “หน้าจอนำเสนอ” และเลือกแชร์เสียงระบบเมื่อมี…" : active
+      ? `${localActive ? "กำลังบันทึกจอนำเสนอ" : "มีการบันทึกจากหน้าควบคุมเครื่องอื่น"} · ${duration}`
+      : recordingNotice || "เลือกหน้าต่าง “หน้าจอนำเสนอ” แล้วไฟล์ WebM จะดาวน์โหลดลงเครื่องนี้เมื่อกดหยุดบันทึก";
+    [els.recordStartBtn, els.recordStartPanelBtn].forEach(button => { button.disabled = busy; button.hidden = active; });
+    [els.recordStopBtn, els.recordStopPanelBtn].forEach(button => { button.hidden = !localActive; button.disabled = !localActive; });
+  }
+  function cleanupRecordingStreams(){
+    displayCaptureStream?.getTracks().forEach(track => track.stop());
+    microphoneStream?.getTracks().forEach(track => track.stop());
+    displayCaptureStream = null; microphoneStream = null;
+    if(recordingAudioContext){ recordingAudioContext.close().catch(() => {}); recordingAudioContext = null; }
+  }
+  async function buildRecordingStream(displayStream, micStream){
+    const videoTracks = displayStream.getVideoTracks();
+    const audioStreams = [displayStream, micStream].filter(stream => stream?.getAudioTracks().length);
+    if(!audioStreams.length) return new MediaStream(videoTracks);
+    recordingAudioContext = new AudioContext();
+    const destination = recordingAudioContext.createMediaStreamDestination();
+    audioStreams.forEach(stream => recordingAudioContext.createMediaStreamSource(new MediaStream(stream.getAudioTracks())).connect(destination));
+    await recordingAudioContext.resume();
+    return new MediaStream([...videoTracks, ...destination.stream.getAudioTracks()]);
+  }
+  function finishRecording(){
+    const type = mediaRecorder?.mimeType || "video/webm";
+    const blob = new Blob(recordingChunks, { type });
+    if(blob.size){
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob); link.download = recordingFileName(localRecordingStartedAt || Date.now()); link.click();
+      setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+      recordingNotice = "บันทึกไฟล์วิดีโอแล้ว ระบบดาวน์โหลด WebM ลงในเครื่องนี้เรียบร้อย";
+    }
+    else recordingNotice = "ไม่พบข้อมูลวิดีโอสำหรับบันทึก";
+    cleanupRecordingStreams();
+    mediaRecorder = null; recordingChunks = [];
+    state.recording = { active:false, startedAt:"" };
+    persist("หยุดบันทึกวิดีโอจอนำเสนอ");
+  }
+  async function startRecording(){
+    if(recordingStartPending || state.recording?.active) return;
+    if(!navigator.mediaDevices?.getDisplayMedia || !window.MediaRecorder){
+      els.recordingStatus.textContent = "เบราว์เซอร์นี้ไม่รองรับการบันทึกหน้าจอ โปรดใช้ Chrome หรือ Microsoft Edge เวอร์ชันล่าสุด";
+      return;
+    }
+    recordingNotice = ""; recordingStartPending = true; renderRecording();
+    try {
+      displayCaptureStream = await navigator.mediaDevices.getDisplayMedia({ video:{ frameRate:{ ideal:30, max:30 } }, audio:true });
+      try { microphoneStream = await navigator.mediaDevices.getUserMedia({ audio:{ echoCancellation:true, noiseSuppression:true } }); }
+      catch { microphoneStream = null; }
+      const stream = await buildRecordingStream(displayCaptureStream, microphoneStream);
+      const mimeType = ["video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm"].find(type => MediaRecorder.isTypeSupported(type));
+      mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType, videoBitsPerSecond:5000000 } : undefined);
+      recordingChunks = [];
+      mediaRecorder.addEventListener("dataavailable", event => { if(event.data.size) recordingChunks.push(event.data); });
+      mediaRecorder.addEventListener("stop", finishRecording, { once:true });
+      displayCaptureStream.getVideoTracks()[0]?.addEventListener("ended", () => { if(mediaRecorder?.state === "recording") mediaRecorder.stop(); }, { once:true });
+      localRecordingStartedAt = Date.now();
+      state.recording = { active:true, startedAt:new Date(localRecordingStartedAt).toISOString() };
+      mediaRecorder.start(1000);
+      persist("เริ่มบันทึกวิดีโอจอนำเสนอ");
+    } catch(error) {
+      cleanupRecordingStreams(); mediaRecorder = null;
+      recordingNotice = error?.name === "NotAllowedError" ? "ยังไม่ได้เลือกหน้าต่างสำหรับบันทึก" : "เริ่มบันทึกไม่สำเร็จ โปรดลองใหม่";
+    } finally { recordingStartPending = false; renderRecording(); }
+  }
+  function stopRecording(){
+    if(mediaRecorder?.state === "recording" || mediaRecorder?.state === "paused"){
+      els.recordingStatus.textContent = "กำลังบันทึกไฟล์วิดีโอ…";
+      mediaRecorder.stop();
+    }
+  }
   function render(){
     renderSelects(); renderCurrent();
     els.groupASlots.innerHTML = A.buildSlotsHtml(state, "A"); els.groupBSlots.innerHTML = A.buildSlotsHtml(state, "B");
@@ -181,11 +276,13 @@
     els.lockBtn.textContent = state.locked ? "🔓 ปลดล็อกผล" : "🔒 ล็อกผล"; els.lockedAlert.hidden = !state.locked;
     els.progressPill.textContent = `ครั้งที่ ${Math.min(state.confirmed.length + 1, 7)} จาก 7`; els.stateTime.textContent = `บันทึกล่าสุด ${A.formatThaiTime(state.updatedAt)}`;
     els.confirmBtn.disabled = state.locked || !state.currentPosition || !state.currentTeamId; els.undoBtn.disabled = state.locked || !state.confirmed.length;
-    renderConnection(); renderReadiness(); renderMobileSession(); renderFirebaseStatus();
+    renderConnection(); renderReadiness(); renderMobileSession(); renderFirebaseStatus(); renderRecording();
     clearTimeout(highlightTimer);
     if(state.pendingRevealUntil > Date.now()) highlightTimer = setTimeout(render, state.pendingRevealUntil - Date.now() + 30);
   }
   els.openDisplayBtn.addEventListener("click", () => window.open(displayLink(), "rapee69-display"));
+  [els.recordStartBtn, els.recordStartPanelBtn].forEach(button => button.addEventListener("click", startRecording));
+  [els.recordStopBtn, els.recordStopPanelBtn].forEach(button => button.addEventListener("click", stopRecording));
   els.startMobileSessionBtn.addEventListener("click", () => startMobileSession(false));
   els.renewMobileSessionBtn.addEventListener("click", () => {
     if(!confirm("สร้าง QR รอบใหม่ใช่หรือไม่\nมือถือที่เปิดอยู่จะต้องสแกน QR ใหม่")) return;
@@ -281,6 +378,9 @@
     if(mobileTimes.length) lastMobilePing = Math.max(lastMobilePing, ...mobileTimes);
     render();
   });
-  window.addEventListener("beforeunload", event => { if(state.confirmed.length < 7 && !state.locked){ event.preventDefault(); event.returnValue = "ยังจับฉลากไม่ครบ 7 ทีม และยังไม่ได้ล็อกผล"; } });
-  window.DrawRemote?.start?.("control"); setInterval(renderConnection, 1000); setInterval(renderReadiness, 1000); updateControlClock(); setInterval(updateControlClock, 1000); render();
+  window.addEventListener("beforeunload", event => {
+    if(mediaRecorder?.state === "recording" || mediaRecorder?.state === "paused") { event.preventDefault(); event.returnValue = "กำลังบันทึกวิดีโออยู่"; return; }
+    if(state.confirmed.length < 7 && !state.locked){ event.preventDefault(); event.returnValue = "ยังจับฉลากไม่ครบ 7 ทีม และยังไม่ได้ล็อกผล"; }
+  });
+  window.DrawRemote?.start?.("control"); setInterval(renderConnection, 1000); setInterval(renderReadiness, 1000); setInterval(renderRecording, 1000); updateControlClock(); setInterval(updateControlClock, 1000); render();
 })();
