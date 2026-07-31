@@ -3,7 +3,7 @@
 window.DRAW_REMOTE_SYNC_URL = "https://script.google.com/macros/s/AKfycbw0K_tqGZVoRINVOclJCs28YEtBTGoWyw_NA1FZE5rEEIgE0evgMNH29bmjS49m8gDGVA/exec";
 
 /*
- * Rapee69 UI hotfix v1.9.9
+ * Rapee69 UI hotfix v1.9.10
  * - แยกชื่อหน้า 4, 5 และ 6 ให้ชัดเจน
  * - เพิ่มตัวเลือกบันทึก PNG สำหรับตารางคะแนนสาย A / Play-off สาย B
  * - แก้หน้า summary ที่มี return ซ้ำใน display.js โดยไม่แก้ไฟล์ระบบหลัก
@@ -232,8 +232,11 @@ window.DRAW_REMOTE_SYNC_URL = "https://script.google.com/macros/s/AKfycbw0K_tqGZ
 
   function stageIsSummary(displayMain, state) {
     const forcedStage = new URLSearchParams(location.search).get("stage");
-    return forcedStage === "summary"
-      || state?.stage === "summary"
+    // When a capture/print window explicitly requests a stage, that stage
+    // must take precedence over the live state. This prevents official or
+    // schedule PNG exports from being replaced by the summary page.
+    if (forcedStage) return forcedStage === "summary";
+    return state?.stage === "summary"
       || Boolean(displayMain.querySelector(".group-summary-slide"));
   }
 
